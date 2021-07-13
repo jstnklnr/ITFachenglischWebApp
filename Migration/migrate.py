@@ -3,7 +3,11 @@ from API import database_interface as dbi
 db = dbi.Database("database")
 books = db.query_dict("SELECT * FROM books")
 topics = db.query_dict("SELECT * FROM topics")
+vocabulary = db.query_dict("SELECT * FROM vocabulary")
 words = {}
+
+for word in vocabulary:
+    words[word.word] = {"book": word.book, "unit": word.unit, "topic": word.topic, "translation": word.translation}
 
 with open("") as f:
     rowNumber = 0
@@ -37,10 +41,14 @@ with open("") as f:
             db.query_dict("INSERT INTO translations")
             translation_id = db.query_dict("SELECT * FROM translations ORDER BY DESC LIMIT 1", one = True).id
 
+            db.insert("vocabulary", {"book": book_id, "unit": unit_id, "topic": topic_id, "word": english_word, "translation": translation_id})
+            words[english_word] = {"book": book_id, "unit": unit_id, "topic": topic_id, "translation": translation_id}
+
         for word in german_words:
             word = word.strip()
 
-            db.insert("vocabulary", {"book": book_id, "unit": unit_id, "topic": topic_id, })
+            db.insert("vocabulary", {"book": book_id, "unit": unit_id, "topic": topic_id, "word": word, "translation": translation_id})
+            words[word] = {"book": book_id, "unit": unit_id, "topic": topic_id, "translation": translation_id}
 
 
 def get_book_id(book):
