@@ -12,7 +12,7 @@ class Audio(Resource):
 
     def get(self):
         args = self.reqparse.parse_args()
-        
+
         #parameter missing
         if not args['books']:
             return {"Error": "Books is missing."}, 400
@@ -39,10 +39,61 @@ class Audio(Resource):
         if args['amount'] < 1:
             return {"Error": "Amount is to low."}, 403
 
-        #TODO
-        if topic[0] == "all":
-            words = db.select("vocabulary", ("languages"), where={"languages=": lang})
+
+        #SQL QUERYS
+        resultList = None
+        if args['topic']:
+            books = args['books'].split(',')
+            topics = args['topics'].split(',')
+
+            #SQL Where Books
+            bookStr = ""
+            bookList = []
+            for i in range(books):
+                bookStr += "books.book = ?"
+                bookList.append(books[i])
+
+                if i != len(books) - 1:
+                    bookStr += " OR "
+            
+            #SQL WHERE Topics
+            topicStr = ""
+            topicList = []
+            for i in range(topics):
+                topicStr += "or topics.topic = ?"
+                topicList.append(topics[i])
+
+                if i != len(topics) - 1:
+                    topicStr += " OR "
+
+            resultList = db.query_dict(f"""
+                                    SELECT vocabulary.word, vocabulary.translation 
+                                    FROM vocabulary
+                                    JOIN languages ON languages.id = vocabulary.language
+                                    JOIN books ON books.id = vocabulary.book
+                                    JOIN topics ON topics.id = vocabulary.topic
+                                    WHERE ({bookStr}) AND ({topicStr}) AND languages.language = 'English'
+                                    ORDER BY rand() LIMIT ?
+                                    """, tuple(bookList + topicList + [args['amount']]))
         else:
-            words = db.select("vocabulary", )
-                                
-        return "hello world"
+            units = args['units'].split(',')  
+
+            unitStr = ""
+            unitList = []
+            for i in range(units):
+                unitStr += "books.book = ?"
+                unitList.append(units[i])
+
+                if i != len(units) - 1:
+                    unitStr += " OR "
+
+            resultList = db.query_dict(f"""
+                                    SELECT vocabulary.word, vocabulary.translation 
+                                    FROM vocabulary
+                                    JOIN languages ON languages.id = vocabulary.language
+                                    JOIN books ON books.id = vocabulary.book
+                                    JOIN units ON units.id = vocabulary.unit
+                                    WHERE ({unitStr}) AND languages.language = 'English' 
+                                    ORDER BY rand() LIMIT ?
+                                    """, tuple(unitList + [args['amount']]))
+        return resultList
