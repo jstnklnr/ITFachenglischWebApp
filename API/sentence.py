@@ -97,4 +97,4 @@ class Sentence(Resource):
                                     WHERE ({unitStr}) AND languages.language = 'English' 
                                     ORDER BY random() LIMIT ?
                                     """, tuple(unitList + [args['amount']]))
-        return resultList
+        return resultList, 200
