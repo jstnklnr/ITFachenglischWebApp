@@ -27,12 +27,42 @@ class Phrase(Resource):
             return {"Error": "Amount is to low."}, 403
 
         #SQL QUERYS
-        resultList = db.query_dict(f"""
-                                SELECT phrases.phrase,
+        transDbList = db.query_dict(f"""
+                                SELECT phrases.translation,
                                 FROM phrases
-                                JOIN languages ON languages.id = vocabulary.language
-                                WHERE languages.language = ?
                                 ORDER BY random() LIMIT ?
                                 """, tuple(args['lang'] + args['amount']))
+        
+        #SQL translation string
+        transIdStr = ""
+        transIdList = []
+        idx = 0
+        for item in transDbList:
+            transIdStr += "translations.translation = ?"
+            transIdList.append(item['translation'])
+            idx += 1
+            
+            if idx != len(transDbList) - 1:
+                transIdStr += " OR "
+#############################################################################
+        phraseList = db.query_dict(f"""
+                                SELECT phrases.phrase,
+                                FROM phrases
+                                JOIN languages ON languages.id = phrases.language
+                                WHERE languages.language = ? AND ({transIdStr})
+                                ORDER BY random()
+                                """, tuple([args['lang']] + transIdList))
+        
+        translationList = db.query_dict(f"""
+                                SELECT phrases.phrase,
+                                FROM phrases
+                                JOIN languages ON languages.id = phrases.language
+                                WHERE languages.language = ? AND ({transIdStr})
+                                ORDER BY random()
+                                """, tuple([args['trans-lang']] + transIdList))
+        
+        resultList = []
+        for item in phraseList:
+            
         
         return resultList, 200
