@@ -21,8 +21,8 @@ class Audio(Resource):
             return {"Error": "Amount is to low."}, 403
 
         resultList = db.query_dict(f"""
-                                SELECT sentences.sentence, sentences.translation 
-                                FROM sentences
+                                SELECT phrases.phrase, phrases.translation 
+                                FROM phrases
                                 ORDER BY random() LIMIT ?
                                 """, tuple(args['amount']))
         
