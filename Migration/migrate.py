@@ -10,7 +10,7 @@ words = {}
 for word in vocabulary:
     words[word.word] = {"book": word.book, "unit": word.unit, "topic": word.topic, "translation": word.translation}
 
-with open("") as f:
+with open("vocabulary.csv", "rw") as f:
     rowNumber = 0
     
     for row in f:
