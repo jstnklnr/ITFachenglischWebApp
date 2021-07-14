@@ -1,6 +1,7 @@
 from API import database_interface as dbi
+import os
 
-db = dbi.Database("database")
+db = dbi.Database(f"{os.path.dirname(__file__)}\\Database\\database.db")
 books = db.query_dict("SELECT * FROM books")
 topics = db.query_dict("SELECT * FROM topics")
 vocabulary = db.query_dict("SELECT * FROM vocabulary")
