@@ -47,7 +47,7 @@ class Vocabulary(Resource):
         langsStr = ""
         langsList = []
         for i in range(langs):
-            langsStr += "or topics.topic = ?"
+            langsStr += "languages.language = ?"
             langsList.append(langs[i])
 
             if i != len(topics) - 1:
