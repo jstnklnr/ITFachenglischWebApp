@@ -34,4 +34,4 @@ class Translation(Resource):
                                     WHERE ({langsStr}) AND vocabulary.word = ?
                                     ORDER BY vocbulary.word
                                     """, tuple(langsStr + [args['word']]))
-        return word
+        return word, 200
