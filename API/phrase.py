@@ -2,7 +2,7 @@ from flask import Flask
 from flask import reqparse
 from flask_restful import Resource
 
-class Sentence(Resource):
+class Phrase(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("lang", type = str)
