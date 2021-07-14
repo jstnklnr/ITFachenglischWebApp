@@ -110,4 +110,4 @@ class Vocabulary(Resource):
                                     WHERE ({unitStr}) AND ({langsStr}) 
                                     ORDER BY random() LIMIT ?
                                     """, tuple(unitList + langsList + [args['amount']]))
-        return resultList
+        return resultList, 200
