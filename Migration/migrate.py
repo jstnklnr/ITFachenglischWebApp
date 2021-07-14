@@ -24,11 +24,12 @@ with open("") as f:
         if not book_id:
             continue
 
-        result = db.query_dict("SELECT * FROM units JOIN books ON books.id = units.book WHERE units.number = ? AND books.book = ?", tuple([int(data[1].split("-")[0].replace(" ", "")), data[0]]))
+        result = db.query_dict("SELECT * FROM units JOIN books ON books.id = units.book WHERE units.number = ? AND books.book = ?", tuple([int(data[1].split("-")[0].replace(" ", "")), data[0]]), True)
         
-        if not result or len(result) <= 0:
+        if not result:
             continue
 
+        unit_id = result.id
         topic_id = get_topic_id(data[2])
         german_words = data[3].split(",")
         english_word = data[4]
