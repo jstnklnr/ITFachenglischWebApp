@@ -1,9 +1,8 @@
 from flask_restful import Resource
 from flask_restful import reqparse
 from flask import Flask, request
-from main import db
-
 import random
+import static
 
 class Vocabulary(Resource):
     def __init__(self):
@@ -15,6 +14,7 @@ class Vocabulary(Resource):
         self.reqparse.add_argument("amount", type = int)
 
     def get(self):
+        db = static.database
         args = self.reqparse.parse_args()
 
         #parameter missing
@@ -91,7 +91,7 @@ class Vocabulary(Resource):
                                     JOIN topics ON topics.id = vocabulary.topic
                                     WHERE ({book_str}) AND ({topic_str}) AND ({langs_str})
                                     ORDER BY random() {limit_string}
-                                    """, tuple(book_list + topic_list + langs_list + if args["amount"]: [args['amount']] else []))
+                                    """, tuple(book_list + topic_list + langs_list + ([args['amount']] if args["amount"] else [])))
         else:
             units = args['units'].split(',')  
 
@@ -112,5 +112,5 @@ class Vocabulary(Resource):
                                     JOIN units ON units.id = vocabulary.unit
                                     WHERE ({unit_str}) AND ({langs_str}) 
                                     ORDER BY random() LIMIT ?
-                                    """, tuple(unit_list + langs_list + [args['amount']]))
+                                    """, tuple(unit_list + langs_list + ([args['amount']] if args["amount"] else [])))
         return result_list, 200

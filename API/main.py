@@ -6,17 +6,18 @@ from flask_restful import Api
 from vocabulary import Vocabulary
 from audio import Audio
 from translation import Translation
-from phrase import Phrase
+from phrases import Phrases
 
 from database_interface import Database
+import static
 
 app = Flask(__name__)
 api = Api(app)
 
-db = Database(f"{os.path.dirname(__file__)}\\..\\Database\\database.db")
-api.add_resource(Vocabulary, '/Vocabulary')
-api.add_resource(Audio, '/Audio')
-api.add_resource(Translation, '/Translations')
-api.add_resource(Phrase, '/Phrase')
+static.database = Database(f"{os.path.dirname(__file__)}\\..\\Database\\database.db")
+api.add_resource(Vocabulary, '/vocabulary')
+api.add_resource(Audio, '/audio')
+api.add_resource(Translation, '/translation')
+api.add_resource(Phrases, '/phrases')
 
-app.run('0.0.0.0', port=5000)
+app.run('0.0.0.0', ssl_context='adhoc', port=5000)

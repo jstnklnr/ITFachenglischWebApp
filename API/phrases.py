@@ -1,8 +1,9 @@
 from flask import Flask
-from flask import reqparse
+from flask_restful import reqparse
 from flask_restful import Resource
+import static
 
-class Phrase(Resource):
+class Phrases(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument("lang", type = str)
@@ -10,6 +11,7 @@ class Phrase(Resource):
         self.reqparse.add_argument("amount", type = int)
 
     def get(self):
+        db = static.database
         args = self.reqparse.parse_args()
 
         #parameter missing
