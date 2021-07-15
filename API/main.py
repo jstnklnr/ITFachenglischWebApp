@@ -17,7 +17,9 @@ import static
 app = Flask(__name__)
 api = Api(app)
 
-static.database = Database(f"{os.path.dirname(__file__)}\\..\\Database\\database.db")
+with app.app_context():
+    static.database = Database(f"{os.path.dirname(__file__)}/../Database/database.db")
+    
 api.add_resource(Vocabulary, '/vocabulary')
 api.add_resource(Audio, '/audio')
 api.add_resource(Translation, '/translation')
