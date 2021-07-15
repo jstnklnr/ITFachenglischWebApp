@@ -41,7 +41,47 @@ class Api():
 
         return languageList
 
-    def getVocabulary(self):
-        pass
+    def getVocabulary(self, books:list, lang:str, amount=0, topics=[], units=[]):
+        bookStr = ""
+        idx = 0
+        for item in books:
+            bookStr += item
+            idx += 1
+            if idx != len(books) - 1:
+                bookStr += ","
+        
+        request_string = ""
+        if topics:
+            topicStr = ""
+            idx = 0
+            for item in topics:
+                topicStr += item
+                idx += 1
+                if idx != len(topics) - 1:
+                    topicStr += ","
+                request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&topics=" + topicStr
+        else:
+            unitStr = ""
+            idx = 0
+            for item in units:
+                unitStr += item
+                idx += 1
+                if idx != len(units) - 1:
+                    unitStr += ","
 
-print(Api("https://localhost:5000").getBooks())
+            request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&units=" + unitStr 
+
+        if amount != 0:
+            request_string + "&amount=" + amount
+
+        res = requests.get(request_string, verify=False)
+
+        print(res.text)
+
+        vocabularyList = []
+        for item in json.loads(res.text):
+            vocabularyList.append(item['unit'])
+
+        return vocabularyList
+
+#print(Api("https://localhost:5000").getVocabulary(["IT Matters"], "English", topics=["Company"]))
