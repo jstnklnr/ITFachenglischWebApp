@@ -27,42 +27,43 @@ class Phrase(Resource):
             return {"Error": "Amount is to low."}, 403
 
         #SQL QUERYS
-        transDbList = db.query_dict(f"""
-                                SELECT phrases.translation,
-                                FROM phrases
+        phrases = db.query_dict(f"""
+                                SELECT phrases.phrase, phrases.translation 
+                                FROM phrases 
+                                JOIN languages 
+                                ON languages.id = phrases.language 
+                                WHERE languages.language = ? 
                                 ORDER BY random() LIMIT ?
-                                """, tuple(args['lang'] + args['amount']))
+                                """, tuple([args['lang'], args['amount']]))
         
         #SQL translation string
-        transIdStr = ""
-        transIdList = []
-        idx = 0
-        for item in transDbList:
-            transIdStr += "translations.translation = ?"
-            transIdList.append(item['translation'])
-            idx += 1
+        trans_id_str = ""
+        trans_id_list = []
+        index = 0
+        for item in phrases:
+            trans_id_str += "translations.translation = ?"
+            trans_id_list.append(item['translation'])
+            index += 1
             
-            if idx != len(transDbList) - 1:
-                transIdStr += " OR "
-#############################################################################
-        phraseList = db.query_dict(f"""
-                                SELECT phrases.phrase,
-                                FROM phrases
-                                JOIN languages ON languages.id = phrases.language
-                                WHERE languages.language = ? AND ({transIdStr})
-                                ORDER BY random()
-                                """, tuple([args['lang']] + transIdList))
+            if index != len(transDbList) - 1:
+                trans_id_str += " OR "
+
         
-        translationList = db.query_dict(f"""
-                                SELECT phrases.phrase,
-                                FROM phrases
-                                JOIN languages ON languages.id = phrases.language
-                                WHERE languages.language = ? AND ({transIdStr})
-                                ORDER BY random()
-                                """, tuple([args['trans-lang']] + transIdList))
+        translations = db.query_dict(f"""
+                                    SElECT phrases.phrase, phrases.translation 
+                                    FROM phrases 
+                                    JOIN languages 
+                                    ON languages.id = phrases.language 
+                                    WHERE languages.language = ? AND ({trans_id_str})
+                                    """, tuple([args["trans-lang"]] + trans_id_list))
+
         
-        resultList = []
-        for item in phraseList:
-            
+        for item in phrases:
+            for translation in translations:
+                if item["translation"] == translation["translation"]:
+                    if item["translations"] is None:
+                        item["translations"] = []
+                        
+                     item["translations"].append(translation)   
         
-        return resultList, 200
+        return phrases, 200
