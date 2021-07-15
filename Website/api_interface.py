@@ -32,4 +32,16 @@ class Api():
 
         return bookList
 
+    def getLanguages(self):
+        res = requests.get(self.url + "/languages", verify=False)
+
+        languageList = []
+        for item in json.loads(res.text):
+            languageList.append(item['book'])
+
+        return languageList
+
+    def getVocabulary(self):
+        pass
+
 print(Api("https://localhost:5000").getBooks())
