@@ -17,6 +17,10 @@ api = Api("https://localhost:5000")
 def index():
     return render_template("home.html")
 
+@main.route('/exercise-selection')
+def exercise_selection():
+    return render_template("exercise_selection.html")
+
 @main.route('/vocabulary-sel')
 def vocabel_sel():
     session["exercise"] = "vocabulary"
@@ -70,7 +74,7 @@ def selection():
         num = len(unitNames)
         headline = "Unit"
 
-    return render_template("selection.html", num=num, namelist=namelist, headline=headline)
+    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href="language")
 
 @main.route('/language')
 def language():
