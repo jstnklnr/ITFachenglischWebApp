@@ -23,10 +23,13 @@ class Phrases(Resource):
             return {"Error": "Translation language is missing."}, 400  
 
         #amount not acceptable
-        if args['amount'] > 100:
-            return {"Error": "Amount is to high."}, 403
-        if args['amount'] < 1:
-            return {"Error": "Amount is to low."}, 403
+        if args["amount"] and args['amount'] < 1:
+            return {"Error": "Amount is too low."}, 403
+            
+        limit_str = ""
+        
+        if args["amount"]:
+            limit_str = "LIMIT ?"
 
         #SQL QUERYS
         phrases = db.query_dict(f"""
@@ -35,8 +38,8 @@ class Phrases(Resource):
                                 JOIN languages 
                                 ON languages.id = phrases.language 
                                 WHERE languages.language = ? 
-                                ORDER BY random() LIMIT ?
-                                """, tuple([args['lang'], args['amount']]))
+                                ORDER BY random() {limit_str}
+                                """, tuple([args['lang']] + [args['amount']] if args["amount"] else []))
         
         #SQL translation string
         trans_id_str = ""

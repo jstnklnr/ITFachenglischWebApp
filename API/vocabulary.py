@@ -7,9 +7,9 @@ import static
 class Vocabulary(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument("books", type = str)
-        self.reqparse.add_argument("topics", type = str)
-        self.reqparse.add_argument("units", type = str)
+        self.reqparse.add_argument("book", type = str)
+        self.reqparse.add_argument("topic", type = str)
+        self.reqparse.add_argument("unit", type = str)
         self.reqparse.add_argument("lang", type = str)
         self.reqparse.add_argument("amount", type = int)
 
@@ -18,37 +18,37 @@ class Vocabulary(Resource):
         args = self.reqparse.parse_args()
 
         #parameter missing
-        if not args['books']:
+        if not args['book']:
             return {"Error": "Books is missing."}, 400
         if not args['amount']:
             return {"Error": "Amount is missing."}, 400
         if not args['lang']:
             return {"Error": "Language is missing."}, 400
-        if ',' in args['books']:
-            if args['units']:
+        if ',' in args['book']:
+            if args['unit']:
                 return {"Error": "Can't use units for more then one book."}, 400
-            if not args['topics']:
+            if not args['topic']:
                 return {"Error": "Topic is missing."}, 400
         else:
-           if not args['units']:
+           if not args['unit']:
                 return {"Error": "Unit is missing."}, 400
-        if  args['topics']:
+        if  args['topic']:
                 return {"Error": "Can't use topics for only one book."}, 400 
                 
         #amount not acceptable
         if args["amount"] and args['amount'] < 1:
-            return {"Error": "Amount is to low."}, 403
+            return {"Error": "Amount is too low."}, 403
 
 
         #SQL WHERE Languages
-        langs = args['languages'].split(',')
+        langs = args['lang'].split(',')
         langs_str = ""
         langs_list = []
-        for i in range(langs):
+        for i in range(len(langs)):
             langs_str += "languages.language = ?"
             langs_list.append(langs[i])
 
-            if i != len(topics) - 1:
+            if i != len(langs) - 1:
                 langs_str += " OR "
 
 
@@ -60,13 +60,13 @@ class Vocabulary(Resource):
         #SQL QUERYS
         result_list = None
         if args['topic']:
-            books = args['books'].split(',')
-            topics = args['topics'].split(',')
+            books = args['book'].split(',')
+            topics = args['topic'].split(',')
 
             #SQL Where Books
             book_str = ""
             book_list = []
-            for i in range(books):
+            for i in range(len(books)):
                 book_str += "books.book = ?"
                 book_list.append(books[i])
 
@@ -76,7 +76,7 @@ class Vocabulary(Resource):
             #SQL WHERE Topics
             topic_str = ""
             topic_list = []
-            for i in range(topics):
+            for i in range(len(topics)):
                 topic_str += "or topics.topic = ?"
                 topic_list.append(topics[i])
 
@@ -93,11 +93,11 @@ class Vocabulary(Resource):
                                     ORDER BY random() {limit_string}
                                     """, tuple(book_list + topic_list + langs_list + ([args['amount']] if args["amount"] else [])))
         else:
-            units = args['units'].split(',')  
+            units = args['unit'].split(',')  
 
             unit_str = ""
             unit_list = []
-            for i in range(units):
+            for i in range(len(units)):
                 unit_str += "units.unit = ?"
                 unit_list.append(units[i])
 
