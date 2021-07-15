@@ -3,6 +3,7 @@ from flask import Blueprint
 from flask import render_template
 from flask import session
 from flask import request
+from flask import redirect
 
 main = Blueprint('main', __name__)
 
@@ -14,29 +15,52 @@ def index():
 def exercise_selection():
     return render_template("exercise_selection.html")
 
-@main.route('/vocabel-test')
+@main.route('/vocabulary') #TODO
 def vocabel_test():
     session["exercise"] = "vocabulary"
-    return render_template("vocabel_test.html")
+    return redirect('/book-selection') 
 
-@main.route('/audio')
+@main.route('/audio') #TODO
 def audio():
     session["exercise"] = "audio"
-    return "hallo"
+    return "hallo" 
 
-@main.route('/phrase')
+@main.route('/phrase') #TODO
 def phrase():
     session["exercise"] = "phrase"
-    return "hallo"
+    return "hallo" 
 
 
 
-@main.route('/book-selection')
+
+@main.route('/book-selection') #TODO
 def book_selection():
-    return "hallo"
+    if session["exercise"] != "vocabulary":
+        return render_template("home.html")
 
-@main.route('/topic-selection')
+    #sql get book names
+        
+    return "hallo" #return all books in html
+
+@main.route('/selection') #TODO
 def topic_selection():
-    session["exercise"] = request.args.get("exercise")
-    return render_template("topic_selection.html")
+    if session["exercise"] != "vocabulary":
+        return render_template("home.html")
+
+    session["book"] = request.args.get("book")
+
+    if "+" in str(session['book']):
+        #api get book topics
+        #num = len of list
+        pass
+    else:
+        #api get book units
+        #num = len of list
+        pass
+
+    num = 0
+    namelist = []
+    
+    return render_template("topic_selection.html", num = num, namelist = namelist)
+
 
