@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/selection_pages.css') }}">
+    <title>Choose your topic!</title>
+</head>
+<body>
+<img src="{{ url_for('static', filename='img/pexels-pixabay-273230.jpg') }}" alt="background_exerciseSelection" class="background_image">
+
+
+
+<div class="wrapper">
+    <div class="typing-demo">
+      Choose your topic.
+    </div>
+</div>
+
+<div class="square-border">
+    <div class="wrap">
+      <img src="{{ url_for('static', filename='svg/pencil-alt-solid.svg') }}" alt="volume_up_icon" class="square-picture">
+        <div class="square-text">Vocabulary</div>  
+    </div>
+  </div>
+
+  <div class="square-border">
+    <div class="wrap">
+      <img src="{{ url_for('static', filename='svg/volume-up-solid.svg') }}" alt="volume_up_icon" class="square-picture">
+        <div class="square-text">Text to Speech</div>
+    </div>
+  </div>
+
+  <div class="square-border">
+    <div class="wrap">
+      <img src="{{ url_for('static', filename='svg/puzzle-piece-solid.svg') }}" alt="volume_up_icon" style="margin-left: 4vw;" class="square-picture">
+        <div class="square-text">Sentence Construction</div>
+    </div>
+  </div>
+
+<div class="footer">
+    <div class="button_wrapper">
+      <a href="startpage"><button class="slide_from_right" style="left: 16vw;">Mainpage </button></a>
+      <a href="topic-selection"><button class="slide_from_left" style="right: 16vw;">Continue</button></a> 
+    </div>
+    <a href="impressum" class="impressum">Impressum</a>
+  </div>
+</body>
+</html>
