@@ -10,6 +10,7 @@ from phrases import Phrases
 from books import Books
 from units import Units
 from topics import Topics
+from languages import Languages
 
 from database_interface import Database
 import static
@@ -27,5 +28,6 @@ api.add_resource(Phrases, '/phrases')
 api.add_resource(Books, '/books')
 api.add_resource(Units, '/units')
 api.add_resource(Topics, '/topics')
+api.add_resource(Languages, '/languages')
 
 app.run('0.0.0.0', ssl_context='adhoc', port=5000)
