@@ -12,20 +12,18 @@ class Audio(Resource):
         db = static.database
         args = self.reqparse.parse_args()
 
-        #parameter missing
-        if not args['amount']:
-            return {"Error": "Amount is missing."}, 400
-
-        #amount not acceptable
-        if args['amount'] > 100:
-            return {"Error": "Amount is to high."}, 403
-        if args['amount'] < 1:
+        if args['amount'] and args['amount'] < 1:
             return {"Error": "Amount is to low."}, 403
 
-        resultList = db.query_dict(f"""
+        limit_str = ""
+        
+        if args["amount"]:
+            limit_str = "LIMIT ?"
+
+        result_list = db.query_dict(f"""
                                 SELECT phrases.phrase
                                 FROM phrases
-                                ORDER BY random() LIMIT ?
-                                """, tuple(args['amount']))
+                                ORDER BY random() {limit_str}
+                                """, tuple([args['amount']] if args['amount'] else []))
         
-        return resultList, 200
+        return result_list, 200
