@@ -64,6 +64,6 @@ class Phrase(Resource):
                     if item["translations"] is None:
                         item["translations"] = []
                         
-                     item["translations"].append(translation)   
+                    item["translations"].append(translation)   
         
         return phrases, 200
