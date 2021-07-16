@@ -55,8 +55,6 @@ class Phrases(Resource):
                                     """, tuple([args["trans-lang"]] + trans_id_list))
 
         
-        print("AFTER SQL")
-        
         for item in phrases:
             for translation in translations:
                 if item["translation"] == translation["translation"]:
