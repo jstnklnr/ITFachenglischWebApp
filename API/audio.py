@@ -42,6 +42,6 @@ class Audio(Resource):
                                 ON languages.id = phrases.language 
                                 WHERE {langs_str}
                                 ORDER BY random() {limit_str}
-                                """, tuple(langs_list + [args['amount']] if args['amount'] else []))
+                                """, tuple(langs_list + ([args['amount']] if args['amount'] else [])))
         
         return result_list, 200

@@ -39,7 +39,7 @@ class Phrases(Resource):
                                 ON languages.id = phrases.language 
                                 WHERE languages.language = ? 
                                 ORDER BY random() {limit_str}
-                                """, tuple([args['lang']] + [args['amount']] if args["amount"] else []))
+                                """, tuple([args['lang']] + ([args['amount']] if args["amount"] else [])))
         
         #SQL translation string
         trans_id_str = ""
