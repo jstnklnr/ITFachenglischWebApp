@@ -22,8 +22,9 @@ class Topics(Resource):
         return db.query_dict(f"""
                             SELECT topics.topic, t0.amount
                             FROM topics
-                            JOIN (SELECT topics.id, COUNT(vocabulary.id) AS amount
-                            FROM vocabulary JOIN topics ON topics.id = vocabulary.topic
-                            JOIN books ON books.id = vocabulary.book
+                            JOIN (SELECT topics.id, COUNT(t1.id) AS amount
+                            FROM (SELECT * FROM vocabulary GROUP BY translation) AS t1
+                            JOIN topics ON topics.id = t1.topic
+                            JOIN books ON books.id = t1.book
                             WHERE {book_str} GROUP BY topics.id) AS t0
                             ON t0.id = topics.id""", tuple(books)), 200
