@@ -16,12 +16,12 @@ class Vocabulary(Resource):
     def get(self):
         db = static.database
         args = self.reqparse.parse_args()
+        
+        print(args["book"])
 
         #parameter missing
         if not args['book']:
             return {"Error": "Books is missing."}, 400
-        if not args['amount']:
-            return {"Error": "Amount is missing."}, 400
         if not args['lang']:
             return {"Error": "Language is missing."}, 400
         if ',' in args['book']:
@@ -30,9 +30,9 @@ class Vocabulary(Resource):
             if not args['topic']:
                 return {"Error": "Topic is missing."}, 400
         else:
-           if not args['unit']:
+            if not args['unit']:
                 return {"Error": "Unit is missing."}, 400
-        if  args['topic']:
+            if args['topic']:
                 return {"Error": "Can't use topics for only one book."}, 400 
                 
         #amount not acceptable
@@ -42,75 +42,46 @@ class Vocabulary(Resource):
 
         #SQL WHERE Languages
         langs = args['lang'].split(',')
-        langs_str = ""
-        langs_list = []
-        for i in range(len(langs)):
-            langs_str += "languages.language = ?"
-            langs_list.append(langs[i])
-
-            if i != len(langs) - 1:
-                langs_str += " OR "
-
+        langs_str = " OR ".join(["languages.language = ?"] * len(langs))
 
         limit_string = ""
         
         if args["amount"]:
-            limit_string = f"LIMIT = ?"
+            limit_string = f"LIMIT ?"
+
+        
+        #SQL Where Books
+        books = args['book'].split(',')
+        book_str = " OR ".join(["books.book = ?"] * len(books))
 
         #SQL QUERYS
         result_list = None
         if args['topic']:
-            books = args['book'].split(',')
             topics = args['topic'].split(',')
-
-            #SQL Where Books
-            book_str = ""
-            book_list = []
-            for i in range(len(books)):
-                book_str += "books.book = ?"
-                book_list.append(books[i])
-
-                if i != len(books) - 1:
-                    book_str += " OR "
             
             #SQL WHERE Topics
-            topic_str = ""
-            topic_list = []
-            for i in range(len(topics)):
-                topic_str += "or topics.topic = ?"
-                topic_list.append(topics[i])
-
-                if i != len(topics) - 1:
-                    topic_str += " OR "
+            topic_str = " OR ".join(["topics.topic = ?"] * len(topics))
 
             result_list = db.query_dict(f"""
-                                    SELECT vocabulary.word, vocabulary.translation 
+                                    SELECT vocabulary.word 
                                     FROM vocabulary
                                     JOIN languages ON languages.id = vocabulary.language
                                     JOIN books ON books.id = vocabulary.book
                                     JOIN topics ON topics.id = vocabulary.topic
                                     WHERE ({book_str}) AND ({topic_str}) AND ({langs_str})
                                     ORDER BY random() {limit_string}
-                                    """, tuple(book_list + topic_list + langs_list + ([args['amount']] if args["amount"] else [])))
+                                    """, tuple(books + topics + langs + ([args['amount']] if args["amount"] else [])))
         else:
-            units = args['unit'].split(',')  
-
-            unit_str = ""
-            unit_list = []
-            for i in range(len(units)):
-                unit_str += "units.unit = ?"
-                unit_list.append(units[i])
-
-                if i != len(units) - 1:
-                    unit_str += " OR "
+            units = args['unit'].split(',')
+            unit_str = " OR ".join(["units.unit = ?"] * len(units))
 
             result_list = db.query_dict(f"""
-                                    SELECT vocabulary.word, vocabulary.translation 
+                                    SELECT vocabulary.word 
                                     FROM vocabulary
                                     JOIN languages ON languages.id = vocabulary.language
                                     JOIN books ON books.id = vocabulary.book
                                     JOIN units ON units.id = vocabulary.unit
-                                    WHERE ({unit_str}) AND ({langs_str}) 
-                                    ORDER BY random() LIMIT ?
-                                    """, tuple(unit_list + langs_list + ([args['amount']] if args["amount"] else [])))
+                                    WHERE ({book_str}) AND ({unit_str}) AND ({langs_str}) 
+                                    ORDER BY random() {limit_string}
+                                    """, tuple(books + units + langs + ([args['amount']] if args["amount"] else [])))
         return result_list, 200

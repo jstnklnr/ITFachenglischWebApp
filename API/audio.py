@@ -20,15 +20,7 @@ class Audio(Resource):
             return {"Error": "Amount is too low."}, 403
 
         langs = args['lang'].split(',')
-        langs_str = ""
-        langs_list = []
-        for i in range(len(langs)):
-            langs_str += "languages.language = ?"
-            langs_list.append(langs[i])
-
-            if i != len(langs) - 1:
-                langs_str += " OR "
-
+        langs_str = " OR ".join(["languages.language = ?"] * len(langs))
 
         limit_str = ""
         
@@ -42,6 +34,6 @@ class Audio(Resource):
                                 ON languages.id = phrases.language 
                                 WHERE {langs_str}
                                 ORDER BY random() {limit_str}
-                                """, tuple(langs_list + ([args['amount']] if args['amount'] else [])))
+                                """, tuple(langs + ([args['amount']] if args['amount'] else [])))
         
         return result_list, 200
