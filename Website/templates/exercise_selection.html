@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/selection_pages.css') }}">
-    <title>Choose your exercise!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/exercise_selection.css') }}">
+    <title>Choose your topic!</title>
     <script>
 
     </script>
@@ -12,46 +12,54 @@
 <body>
 <img src="{{ url_for('static', filename='img/lowpoly-grey-gradient-vector.png') }}" alt="background_exerciseSelection" class="background_image">
 
-  <div class="wrapper">
-    <div class="typing-demo">
-      Choose your exercise.
-    </div>
+
+ <!-- 
+<div class="wrapper">
+  <div class="typing-demo">
+    Choose your exercise.
+  </div>
 </div>
+ Mein Kommentar -->
+
 
   
+<div class="box_center">
 
   <div class="square-border">
-    
-    <div class="wrap">
-      <a href="book-selections"><img src="{{ url_for('static', filename='svg/pencil-alt-solid.svg') }}" class="square-picture"></a>
-        <div class="square-text">Vocabulary</div>  
-    </div>
+      <div class="wrap">
+        <a href="selection"><img src="{{ url_for('static', filename='svg/pencil-alt-solid.svg') }}" alt="volume_up_icon" class="square-picture"></a>
+          <div class="square-text">Vocabulary</div>  
+      </div>
   </div>
-
-
+  
   <div class="square-border">
     <div class="wrap">
-      <img src="{{ url_for('static', filename='svg/volume-up-solid.svg') }}" alt="volume_up_icon" class="square-picture">
+      <a href=""><img src="{{ url_for('static', filename='svg/volume-up-solid.svg') }}" alt="volume_up_icon" class="square-picture"></a> 
         <div class="square-text">Text to Speech</div>
     </div>
   </div>
 
   <div class="square-border">
     <div class="wrap">
-      <img src="{{ url_for('static', filename='svg/puzzle-piece-solid.svg') }}" style="margin-left: 4vw;" class="square-picture">
+      <a href=""><img src="{{ url_for('static', filename='svg/puzzle-piece-solid.svg') }}" alt="volume_up_icon" style="margin-left: 2vw;" class="square-picture"></a> 
         <div class="square-text">Sentence Construction</div>
     </div>
   </div>
+  
+</div>      
+    
+ 
 
 
-  <div class="footer">
-    <div class="button_wrapper">
-      <a href="/"><button class="slide_from_right" style="left: 16vw;">Mainpage </button></a>
-      <a href="topic-selection"><button class="slide_from_left" style="right: 16vw;">Continue</button></a> 
-    </div>
-    <a href="impressum" class="impressum">Impressum</a>
-  </div>
 
+
+
+
+<div class="footer">
+  <a href="impressum" class="impressum">Impressum</a>
+</div>
+  
+  
 
 </body>
 </html>
