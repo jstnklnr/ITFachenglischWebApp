@@ -12,11 +12,12 @@ class Topics(Resource):
         db = static.database
         args = self.reqparser.parse_args()
         
-        if not args['book']:
-            return db.query_dict("SELECT topic FROM topics"), 200
-            
-        books = args['book'].split(",")
-        book_str = " OR ".join(["books.book = ?"] * len(books))
+        books = []
+        book_str = "1"
+        
+        if args['book']:
+            books = args['book'].split(",")
+            book_str = " OR ".join(["books.book = ?"] * len(books))
         
         return db.query_dict(f"""
                             SELECT topics.topic, t0.amount
@@ -25,4 +26,4 @@ class Topics(Resource):
                             FROM vocabulary JOIN topics ON topics.id = vocabulary.topic
                             JOIN books ON books.id = vocabulary.book
                             WHERE {book_str} GROUP BY topics.id) AS t0
-                            ON t0.id = topics.id""", tuple(books))
+                            ON t0.id = topics.id""", tuple(books)), 200
