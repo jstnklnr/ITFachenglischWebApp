@@ -46,7 +46,7 @@ def book_selection():
         return render_template("home.html")
 
     namelist = api.getBooks()
-    num = len(bookNames)
+    num = len(namelist)
     headline = "Book"
     href = "selection"
 
@@ -57,20 +57,23 @@ def selection():
     if session["exercise"] != "vocabulary":
         return render_template("home.html")
 
+    if not request.args.get("book"):
+        return "failed"
+
     session["book"] = request.args.get("book")
 
     num = 0
     namelist = []
     headline = ""
-    if "+" in str(session['book']):
+    if "," in str(session['book']):
         session['selection'] = "topic"
         namelist = api.getTopics()
-        num = len(topicNames)
+        num = len(namelist)
         headline = "Topic"
     else:
         session['selection'] = "unit"
         namelist = api.getUnits(session["book"])
-        num = len(unitNames)
+        num = len(namelist)
         headline = "Unit"
     href="language"
 
@@ -87,7 +90,7 @@ def language():
         session['topic'] = request.args.get('unit')
 
     namelist = api.getLanguages()
-    num = len(langList)
+    num = len(namelist)
     headline = "language"
     href = ""
 

@@ -126,7 +126,7 @@ height: auto
   padding-bottom : 15%; /* = width for a 1:1 aspect ratio */
   border: solid #000000;
   border-radius: 25px;
-  float: left;
+
   margin: 1%;
 
 }
@@ -169,21 +169,19 @@ div.example {
 }
 */
 
-#page {
-  display: grid;
-  width: 100%;
-display: block;
+.page{
 
-
-
+  position: absolute;
+top: 25%;
 }
+
 header {
   background-color: lime;
   display: flex;
-  height: 80px;
+  height: 70px;
   justify-content: center;
   width: 100vw;
-  position: relative;
+
 }
 main {
   background-color: yellow;

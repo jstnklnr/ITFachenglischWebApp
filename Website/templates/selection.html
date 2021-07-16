@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/selection_pages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/selection.css') }}">
     <script src="{{ url_for('static', filename='js/readfile.js') }}"></script>
     <title>Choose your exercise!</title>
     <script>
@@ -13,22 +13,18 @@
 <body>
 <img src="{{ url_for('static', filename='img/lowpoly-grey-gradient-vector.png') }}" alt="background_exerciseSelection" class="background_image">
 
-<section id="page">
-  <header> <div class="typing-demo">Choose your Topic</div> </header>
+<section class="page">
+  
+  <header> 
+    <div class="typing-demo">Choose your {{headline}}</div> 
+  </header>
 
   <main>
-       <div class="square-border">
-            <div class="selection_text">Vocabulary</div>  
-        </div> 
-        <div class="square-border">
-          <div class="selection_text">Vocabulary</div>  
-      </div> 
+    {%for i in range(num)%}
       <div class="square-border">
-        <div class="selection_text">Vocabulary</div>  
-    </div> 
-    <div class="square-border">
-      <div class="selection_text">Vocabulary</div>  
-  </div>      
+          <div class="selection_text">{{namelist[i]}}</div>  
+      </div> 
+    {% endfor %}    
   </main>
 </section>
 <!--
