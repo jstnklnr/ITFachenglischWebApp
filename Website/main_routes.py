@@ -29,7 +29,7 @@ def vocabel_sel():
 @main.route('/audio')
 def audio():
     session["exercise"] = "audio"
-    
+
     return redirect("/amount") 
 
 @main.route('/phrase-sel')
@@ -82,7 +82,7 @@ def selection():
 
 @main.route('/language')
 def language():
-    if session["exercise"] != "vocabulary" or session["exercise"] != "phrase":
+    if session["exercise"] != "vocabulary" and session["exercise"] != "phrase":
        return render_template("home.html")
 
     if not request.args.get('topic') or request.args.get('unit'):
