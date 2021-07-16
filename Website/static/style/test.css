@@ -126,13 +126,12 @@ height: auto
   padding-bottom : 15%; /* = width for a 1:1 aspect ratio */
   border: solid #000000;
   border-radius: 25px;
-
   margin: 1%;
 
 }
 
 
-.selection_text{
+.square-text{
 
 }
 .square-picture{
@@ -154,25 +153,10 @@ div.example {
   font-size: 80px;
 }
 
-/* If the screen size is 600px wide or less, set the font-size of <div> to 30px 
-@media screen and (min-width: 601px) {
-  .square-text {
-    font-size: 20px;
-  }
-}
-
-/* If the screen size is 600px wide or less, set the font-size of <div> to 30px 
-@media screen and (max-width: 1100px) {
-  .square-text {
-    font-size: 10px;
-  }
-}
-*/
-
 #page{
 
-  position: absolute;
-top: 25%;
+position: absolute;
+top: 20vh;
 }
 
 header {
@@ -183,14 +167,21 @@ header {
   width: 100vw;
 
 }
-main {
+#main {
   background-color: yellow;
   display: flex;
   position: relative;
   width: 100vw;
  justify-content: center;
-
 }
+#main2 {
+  background-color: yellow;
+  display: flex;
+  position: relative;
+  width: 100vw;
+ justify-content: center;
+}
+
 
 .typing-demo {
   animation: typing 1.5s steps(22), blink .6s step-end infinite alternate;

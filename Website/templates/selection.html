@@ -11,7 +11,7 @@
     </script>
 </head>
 <body>
-<img src="{{ url_for('static', filename='img/lowpoly-grey-gradient-vector.png') }}" alt="background_exerciseSelection" class="background_image">
+<img src="{{ url_for('static', filename='img/lowpoly-grey-gradient-vector.png') }}" alt="background_exerciseSelection" alt="background_exerciseSelection" class="background_image">
 
 <section class="page">
   
@@ -19,13 +19,14 @@
     <div class="typing-demo">Choose your {{headline}}</div> 
   </header>
 
-  <main>
+  <main id="main">
     {%for i in range(num)%}
       <div class="square-border">
           <div class="selection_text">{{namelist[i]}}</div>  
       </div> 
-    {% endfor %}    
+    {% endfor %}   
   </main>
+  <main id="main2"></main>
 </section>
 <!--
 <div class="box_center">
