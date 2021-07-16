@@ -15,8 +15,6 @@ class Phrases(Resource):
         args = self.reqparse.parse_args()
 
         #parameter missing
-        if not args['amount']:
-            return {"Error": "Amount is missing."}, 400
         if not args['lang']:
             return {"Error": "Language is missing."}, 400   
         if not args['trans-lang']:
@@ -42,17 +40,11 @@ class Phrases(Resource):
                                 """, tuple([args['lang']] + ([args['amount']] if args["amount"] else [])))
         
         #SQL translation string
-        trans_id_str = ""
+        trans_id_str = " OR ".join(["phrases.translation = ?"] * len(phrases))
         trans_id_list = []
-        index = 0
+        
         for item in phrases:
-            trans_id_str += "translations.translation = ?"
             trans_id_list.append(item['translation'])
-            index += 1
-            
-            if index != len(transDbList) - 1:
-                trans_id_str += " OR "
-
         
         translations = db.query_dict(f"""
                                     SElECT phrases.phrase, phrases.translation 
@@ -63,10 +55,12 @@ class Phrases(Resource):
                                     """, tuple([args["trans-lang"]] + trans_id_list))
 
         
+        print("AFTER SQL")
+        
         for item in phrases:
             for translation in translations:
                 if item["translation"] == translation["translation"]:
-                    if item["translations"] is None:
+                    if not "translations" in item:
                         item["translations"] = []
                         
                     item["translations"].append(translation)   
