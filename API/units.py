@@ -16,4 +16,12 @@ class Units(Resource):
             return {"Error": "Book is missing."}, 400
         
         db = static.database
-        return db.query_dict("SELECT unit FROM units JOIN books ON books.id = units.book WHERE books.book = ?", [args["book"]]), 200
+        return db.query_dict("""
+                            SELECT units.unit, t0.amount 
+                            FROM units 
+                            JOIN (SELECT units.id, COUNT(vocabulary.id) AS amount
+                            FROM vocabulary
+                            JOIN units ON units.id = vocabulary.unit
+                            JOIN books ON books.id = vocabulary.book
+                            WHERE books.book = ? GROUP BY units.id) AS t0
+                            ON t0.id = units.id""", [args["book"]]), 200
