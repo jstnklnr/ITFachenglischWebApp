@@ -26,10 +26,11 @@ def vocabel_sel():
     session["exercise"] = "vocabulary"
     return redirect('/book-selection') 
 
-@main.route('/audio') #TODO
+@main.route('/audio')
 def audio():
     session["exercise"] = "audio"
-    return "hallo" 
+    
+    return redirect("/amount") 
 
 @main.route('/phrase-sel')
 def phrase_sel():
@@ -84,6 +85,9 @@ def language():
     if session["exercise"] != "vocabulary" or session["exercise"] != "phrase":
        return render_template("home.html")
 
+    if not request.args.get('topic') or request.args.get('unit'):
+        return "failed"
+
     if session['selection'] == "topic":
         session['unit'] = request.args.get('topic')
     else:
@@ -106,11 +110,17 @@ def language():
 
 @main.route('/amount')
 def amount():
-    if session["exercise"] != "vocabulary" or session["exercise"] != "phrase" or session["exercise"] != "audio":
+    if session["exercise"] != "vocabulary" and session["exercise"] != "phrase" and session["exercise"] != "audio":
         return render_template("home.html")
 
-    session['language'] = request.args.get('language')
-    session['started'] = True
+    if session["exercise"] != "audio":
+        print(session["exercise"])
+
+        if not request.args.get('language'):
+                return "failed"
+
+        session['language'] = request.args.get('language')
+        session['started'] = True
 
     return render_template("amount.html")
 ############################################
@@ -157,7 +167,7 @@ def vocabulary():
 ###########################################
 #
 # 'exercise' string - name of the exercise vocabulary, phrase or audio
-# 'book' string - name of book
+# 'book' string - name of book(s) 
 # 'selection' string - unit or topic
 # 'unit' string list - names of units
 # 'topic' string list - names of topics
