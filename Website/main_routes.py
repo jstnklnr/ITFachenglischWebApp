@@ -48,7 +48,6 @@ def book_selection():
     namelist = api.getBooks()
     num = len(bookNames)
     headline = "Book"
-
     href = "selection"
 
     return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href)
@@ -73,13 +72,19 @@ def selection():
         namelist = api.getUnits(session["book"])
         num = len(unitNames)
         headline = "Unit"
+    href="language"
 
-    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href="language")
+    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href)
 
 @main.route('/language')
 def language():
     if session["exercise"] != "vocabulary" or session["exercise"] != "phrase":
-       return render_template("home.html") 
+       return render_template("home.html")
+
+    if session['selection'] == "topic":
+        session['unit'] = request.args.get('topic')
+    else:
+        session['topic'] = request.args.get('unit')
 
     namelist = api.getLanguages()
     num = len(langList)
@@ -96,6 +101,15 @@ def language():
     return render_template("selection.html", num=num, namelist=namelist, headline=headline)
 
 
+@main.route('/amount')
+def amount():
+    if session["exercise"] != "vocabulary" or session["exercise"] != "phrase" or session["exercise"] != "audio":
+        return render_template("home.html")
+
+    session['language'] = request.args.get('language')
+    session['started'] = True
+
+    return render_template("amount.html")
 ############################################
 #Exercise
 ############################################
@@ -104,5 +118,46 @@ def vocabulary():
     if session['ready'] != True:
         return render_template("home.html")
 
-    language = request.args.get('language')
-    return 'ok'
+    if session['vocabulary_test'] == []:
+        return render_template("ready.html")
+
+    if session['started']:
+        session['started'] = False
+
+        amount = 0
+        if request.args.get('amount'):
+            amount = request.args.get('amount')
+
+        topic_or_unit = ""
+        data = []
+        if session['selection'] == "topic":
+            topic_or_unit = session['topic'].split(",")
+            data = api.getVocabulary(session['book'].split(","), language, amount, topic=topic_or_unit)
+        else:
+            topic_or_unit = session['unit'].split(",")
+            data = api.getVocabulary([session['book']], language, amount, unit=topic_or_unit)
+    
+        session['vocabulary_test'] = data
+
+    word = session['vocabulary_test'].pop()
+    transLang = ""
+    if session['language'] == "English":
+        transLang = "German"
+    else:
+        transLang = "English"
+    translation = api.getTranslation(word, session['language'], transLang)
+
+    return render_template("vocabulary.html", word=word, translation=translation)
+
+###########################################
+#Sessions
+###########################################
+#
+# 'exercise' string - name of the exercise vocabulary, phrase or audio
+# 'book' string - name of book
+# 'selection' string - unit or topic
+# 'unit' string list - names of units
+# 'topic' string list - names of topics
+# 'ready' boolean - everything is selected
+# 'started' boolean - only first time on vocabulary for api request
+# 'vocabulary_test' list of dict - list of vocabulary, lenghts equals selected amount
