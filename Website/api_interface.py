@@ -46,9 +46,10 @@ class Api():
         idx = 0
         for item in books:
             bookStr += item
-            idx += 1
+            
             if idx != len(books) - 1:
                 bookStr += ","
+            idx += 1
         
         request_string = ""
         if topics:
@@ -56,20 +57,24 @@ class Api():
             idx = 0
             for item in topics:
                 topicStr += item
-                idx += 1
                 if idx != len(topics) - 1:
                     topicStr += ","
-                request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&topics=" + topicStr
+                idx += 1
+
+            request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&topics=" + topicStr
         else:
             unitStr = ""
             idx = 0
             for item in units:
                 unitStr += item
-                idx += 1
                 if idx != len(units) - 1:
                     unitStr += ","
+                idx += 1
 
-            request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&units=" + unitStr 
+            request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&unit=" + unitStr 
+
+        print(request_string)
+
 
         if amount != 0:
             request_string + "&amount=" + amount
@@ -84,4 +89,4 @@ class Api():
 
         return vocabularyList
 
-#print(Api("https://localhost:5000").getVocabulary(["IT Matters"], "English", topics=["Company"]))
+print(Api("https://localhost:5000").getVocabulary(["IT Matters", "Mity Matters"], "English", topics=["Company", "Software"]))
