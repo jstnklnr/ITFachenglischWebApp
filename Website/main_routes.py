@@ -83,7 +83,7 @@ def selection():
 def language():
     if session["exercise"] != "vocabulary" and session["exercise"] != "phrase":
        return render_template("home.html")
-
+    
     if not request.args.get('topic') and not request.args.get('unit'):
         return "failed"
 
@@ -121,7 +121,7 @@ def amount():
         session['language'] = request.args.get('language')
         session['started'] = True
 
-    return render_template("amount.html")
+    return "amount"#render_template("amount.html")
 ############################################
 #Exercise
 ############################################
@@ -129,9 +129,6 @@ def amount():
 def vocabulary():
     if session['ready'] != True:
         return render_template("home.html")
-
-    if session['vocabulary_test'] == []:
-        return render_template("ready.html")
 
     if session['started']:
         session['started'] = False
@@ -147,9 +144,12 @@ def vocabulary():
             data = api.getVocabulary(session['book'].split(","), language, amount, topic=topic_or_unit)
         else:
             topic_or_unit = session['unit'].split(",")
-            data = api.getVocabulary([session['book']], language, amount, unit=topic_or_unit)
+            data = api.getVocabulary(session['book'].split(","), language, amount, unit=topic_or_unit)
     
         session['vocabulary_test'] = data
+
+    if session['vocabulary_test'] == []:
+        return render_template("ready.html")
 
     word = session['vocabulary_test'].pop()
     transLang = ""

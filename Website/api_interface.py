@@ -37,7 +37,7 @@ class Api():
 
         languageList = []
         for item in json.loads(res.text):
-            languageList.append(item['book'])
+            languageList.append(item['language'])
 
         return languageList
 
@@ -89,4 +89,4 @@ class Api():
 
         return vocabularyList
 
-#print(Api("https://localhost:5000").getVocabulary(["IT Matters", "Mity Matters"], "English", topics=["Company", "Software"]))
+print(Api("https://localhost:5000").getLanguages())
