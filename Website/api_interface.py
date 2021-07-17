@@ -89,4 +89,13 @@ class Api():
 
         return vocabularyList
 
-print(Api("https://localhost:5000").getLanguages())
+    def getTranslation(self, word:str, lang, trans_lang:str):
+        res = requests.get(self.url + "/translation?word=" + word + "&lang=" + lang + "&trans-lang=" + trans_lang)
+
+        transList = []
+        for item in json.loads(res.text):
+            transList.append(item['word'])
+
+        return transList
+
+#print(Api("https://localhost:5000").getUnits("IT%20Matters"))
