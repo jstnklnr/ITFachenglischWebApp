@@ -147,7 +147,7 @@ def vocabulary():
         session['vocabulary_test'] = data
 
     if session['vocabulary_test'] == []:
-        return render_template("ready.html")
+        return render_template("home.html")
 
     word = session['vocabulary_test'].pop()
     transLang = ""
