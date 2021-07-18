@@ -41,55 +41,52 @@ class Api():
 
         return languageList
 
-    def getVocabulary(self, books:list, lang:str, amount=0, topics=[], units=[]):
+    def getVocabulary(self, book:list, lang:str, amount=0, topic=[], unit=[]):
         bookStr = ""
         idx = 0
-        for item in books:
+        for item in book:
             bookStr += item
             
-            if idx != len(books) - 1:
+            if idx != len(book) - 1:
                 bookStr += ","
             idx += 1
         
         request_string = ""
-        if topics:
+        if topic:
             topicStr = ""
             idx = 0
-            for item in topics:
+            for item in topic:
                 topicStr += item
-                if idx != len(topics) - 1:
+                if idx != len(topic) - 1:
                     topicStr += ","
                 idx += 1
 
-            request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&topics=" + topicStr
+            request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&topic=" + topicStr
         else:
             unitStr = ""
             idx = 0
-            for item in units:
+            for item in unit:
                 unitStr += item
-                if idx != len(units) - 1:
+                if idx != len(unit) - 1:
                     unitStr += ","
                 idx += 1
 
             request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&unit=" + unitStr 
 
-        print(request_string)
-
+        print(amount)
 
         if amount != 0:
-            request_string + "&amount=" + amount
+            request_string += "&amount=" + amount
 
         res = requests.get(request_string, verify=False)
 
-        print(res.text)
-
         vocabularyList = []
         for item in json.loads(res.text):
-            vocabularyList.append(item['unit'])
+            vocabularyList.append(item['word'])
 
         return vocabularyList
 
-    def getTranslation(self, word:str, lang, trans_lang:str):
+    def getTranslation(self, word:str, lang:str, trans_lang:str):
         res = requests.get(self.url + "/translation?word=" + word + "&lang=" + lang + "&trans-lang=" + trans_lang)
 
         transList = []
@@ -98,4 +95,4 @@ class Api():
 
         return transList
 
-#print(Api("https://localhost:5000").getUnits("IT%20Matters"))
+print(Api("https://localhost:5000").getTranslation("etwas Werbung machen", "German", "English"))

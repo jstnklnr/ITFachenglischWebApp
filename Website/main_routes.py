@@ -88,9 +88,9 @@ def language():
         return "failed"
 
     if session['selection'] == "topic":
-        session['unit'] = request.args.get('topic')
+        session['topic'] = request.args.get('topic')
     else:
-        session['topic'] = request.args.get('unit')
+        session['unit'] = request.args.get('unit')
 
     namelist = api.getLanguages()
     num = len(namelist)
@@ -102,8 +102,6 @@ def language():
     else:
         href = "phrase"
 
-    session['ready'] = True
-
     return render_template("selection.html", num=num, namelist=namelist, headline=headline)
 
 
@@ -112,13 +110,13 @@ def amount():
     if session["exercise"] != "vocabulary" and session["exercise"] != "phrase" and session["exercise"] != "audio":
         return render_template("home.html")
 
-    if session["exercise"] != "audio":
-        print(session["exercise"])
+    if session["exercise"] == "vocabulary" or session['exercise'] == "audio":
 
         if not request.args.get('language'):
                 return "failed"
 
         session['language'] = request.args.get('language')
+        session['ready'] = True
         session['started'] = True
 
     return "amount"#render_template("amount.html")
@@ -127,7 +125,7 @@ def amount():
 ############################################
 @main.route('/vocabulary')
 def vocabulary():
-    if session['ready'] != True:
+    if not session['ready']:
         return render_template("home.html")
 
     if session['started']:
@@ -137,14 +135,14 @@ def vocabulary():
         if request.args.get('amount'):
             amount = request.args.get('amount')
 
-        topic_or_unit = ""
+        topic_or_unit = []
         data = []
         if session['selection'] == "topic":
             topic_or_unit = session['topic'].split(",")
-            data = api.getVocabulary(session['book'].split(","), language, amount, topic=topic_or_unit)
+            data = api.getVocabulary(session['book'].split(","), session['language'], amount, topic=topic_or_unit)
         else:
             topic_or_unit = session['unit'].split(",")
-            data = api.getVocabulary(session['book'].split(","), language, amount, unit=topic_or_unit)
+            data = api.getVocabulary(session['book'].split(","), session['language'], amount, unit=topic_or_unit)
     
         session['vocabulary_test'] = data
 
@@ -159,7 +157,7 @@ def vocabulary():
         transLang = "English"
     translation = api.getTranslation(word, session['language'], transLang)
 
-    return render_template("vocabulary.html", word=word, translation=translation)
+    return render_template("vocabulary.html", word=word['word'], translation=translation['word'])
 
 ###########################################
 #Sessions
