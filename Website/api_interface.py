@@ -95,4 +95,13 @@ class Api():
 
         return transList
 
+    def getAudio(self, lang:str, amount:int):
+        res = repr.get(self.url + "audio?lang=" + lang + "&amount=" + amount)
+
+        audioList = []
+        for item in json.loads(res.text):
+            audioList.append(item['phrase'])
+
+        return audioList
+
 #print(Api("https://localhost:5000").getTranslation("für etwas Werbung machen", "German", "English"))

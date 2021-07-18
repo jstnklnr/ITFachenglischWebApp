@@ -26,8 +26,8 @@ def vocabel_sel():
     session["exercise"] = "vocabulary"
     return redirect('/book-selection') 
 
-@main.route('/audio')
-def audio():
+@main.route('/audio-sel')
+def audio_sel():
     session["exercise"] = "audio"
     return redirect("/amount") 
 
@@ -110,30 +110,34 @@ def amount():
     if session["exercise"] != "vocabulary" and session["exercise"] != "phrase" and session["exercise"] != "audio":
         return render_template("home.html")
 
-    if session["exercise"] == "vocabulary" or session['exercise'] == "audio":
+    if session["exercise"] == "vocabulary":
 
         if not request.args.get('language'):
                 return "failed"
 
         session['language'] = request.args.get('language')
-        session['ready'] = True
-        session['started'] = True
 
+    session['ready'] = True
+    session['started'] = True
+        
     return "amount"#render_template("amount.html")
 ############################################
 #Exercise
 ############################################
 @main.route('/vocabulary')
 def vocabulary():
-    if not session['ready']:
+    if not session['ready'] or session['exercise'] != "vocabulary":
         return render_template("home.html")
 
     if session['started']:
+        session['test_data'] = []
         session['started'] = False
 
         amount = 0
-        if request.args.get('amount'):
-            amount = request.args.get('amount')
+        if not request.args.get('amount'):
+            return "failed"
+
+        amount = request.args.get('amount')    
 
         topic_or_unit = []
         data = []
@@ -144,12 +148,12 @@ def vocabulary():
             topic_or_unit = session['unit'].split(",")
             data = api.getVocabulary(session['book'].split(","), session['language'], amount, unit=topic_or_unit)
     
-        session['vocabulary_test'] = data
+        session['test_data'] = data
 
-    if session['vocabulary_test'] == []:
+    if session['test_data'] == []:
         return render_template("home.html")
 
-    word = session['vocabulary_test'].pop()
+    word = session['test_data'].pop()
     transLang = ""
     if session['language'] == "English":
         transLang = "German"
@@ -165,6 +169,39 @@ def vocabulary():
 
     return render_template("vocabulary.html", word=word, translation=translation, trans_lang=trans_lang)
 
+
+@main.route('/audio')
+def audio():
+    if not session['ready'] or session['exercise'] != "audio":
+        return render_template("home.html")
+
+    if session['started']:
+        session['test_data'] = []
+        session['started'] = False
+
+        amount = 0
+        if request.args.get('amount'):
+            return "failed"
+
+        amount = request.args.get('amount')
+
+        data = api.getAudio(amount)
+        session['test_data'] = data
+
+    if session['test_data'] == []:
+        return render_template("home.html")
+
+    phrase = session['test_data'].pop()
+
+    trans_lang = ""
+    if session['language'] == "English":
+        trans_lang = "German"
+    else:
+        trans_lang = "English"
+        
+    return render_template("audio.html", phrase=phrase, trans_lang=trans_lang) #TODO
+
+
 ###########################################
 #Sessions
 ###########################################
@@ -176,4 +213,4 @@ def vocabulary():
 # 'topic' string list - names of topics
 # 'ready' boolean - everything is selected
 # 'started' boolean - only first time on vocabulary for api request
-# 'vocabulary_test' list of dict - list of vocabulary, lenghts equals selected amount
+# 'test_data' list of dict - list of data (vocabulary or audio), length equals selected amount
