@@ -1,0 +1,20 @@
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    /*background-image: url("../media/selection_background.png");
+    background-size: auto;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(12px);*/
+}
+
+.row div div {
+    width: 100%;
+    padding-top: 100%;
+}
+
+.selection-button {
+    border-radius: 25px;
+}
