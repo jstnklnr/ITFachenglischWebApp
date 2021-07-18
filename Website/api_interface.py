@@ -87,7 +87,7 @@ class Api():
         return vocabularyList
 
     def getTranslation(self, word:str, lang:str, trans_lang:str):
-        res = requests.get(self.url + "/translation?word=" + word + "&lang=" + lang + "&trans-lang=" + trans_lang)
+        res = requests.get(self.url + "/translation?word=" + word + "&lang=" + lang + "&trans-lang=" + trans_lang, verify=False)
 
         transList = []
         for item in json.loads(res.text):
@@ -95,4 +95,4 @@ class Api():
 
         return transList
 
-print(Api("https://localhost:5000").getTranslation("etwas Werbung machen", "German", "English"))
+print(Api("https://localhost:5000").getTranslation("für etwas Werbung machen", "German", "English"))
