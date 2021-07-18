@@ -157,7 +157,13 @@ def vocabulary():
         transLang = "English"
     translation = api.getTranslation(word, session['language'], transLang)
 
-    return render_template("vocabulary.html", word=word['word'], translation=translation['word'])
+    trans_lang = ""
+    if session['language'] == "English":
+        trans_lang = "German"
+    else:
+        trans_lang = "English"
+
+    return render_template("vocabulary.html", word=word, translation=translation, trans_lang=trans_lang)
 
 ###########################################
 #Sessions

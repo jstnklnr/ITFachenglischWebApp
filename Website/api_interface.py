@@ -95,4 +95,4 @@ class Api():
 
         return transList
 
-print(Api("https://localhost:5000").getTranslation("für etwas Werbung machen", "German", "English"))
+#print(Api("https://localhost:5000").getTranslation("für etwas Werbung machen", "German", "English"))
