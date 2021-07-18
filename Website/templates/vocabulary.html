@@ -12,14 +12,16 @@
             <div class="card">
                 <h1>Vocabulary test</h1>  
               <div class="card card--accent">
-              <h2> <img src="{{ url_for('static', filename='svg/12837215941548336240.svg') }}" alt="svg" class="icon"> Englische Vokabel</h2>
+              <h2> <img src="{{ url_for('static', filename='svg/12837215941548336240.svg') }}" alt="svg" class="icon">{{word}}</h2>
               <label class="input">
                 <input class="input__field" type="text" placeholder=" " />
-                <span class="input__label">German word...</span>
+                <span class="input__label">{{trans_lang}} word</span>
               </label>
               
               <div class="button-group">
-                <button>Check</button>
+                <a href="vocabulary">
+                  <button>Check</button>
+                </a>
                 <button type="reset">Reset</button>
               </div>
             </div>
