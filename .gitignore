@@ -2,4 +2,4 @@
 Website/flask_session
 Website/__pycache__
 API/__pycache__
-.vscode
+/.vscode
