@@ -135,6 +135,8 @@ def amount():
 @main.route('/vocabulary')
 def vocabulary():
     if not session['ready'] or session['exercise'] != "vocabulary":
+        print(session['ready'])
+        print(session['exercise'])
         return render_template("home.html")
 
     if session['started']:
@@ -161,13 +163,22 @@ def vocabulary():
     if session['test_data'] == []:
         return render_template("home.html")
 
-    word = session['test_data'].pop()
-    transLang = ""
+    word = session['test_data'][len(session['test_data']) - 1]
+    session['current'] = word
+
+    trans_lang = ""
     if session['language'] == "English":
-        transLang = "German"
+        trans_lang = "German"
     else:
-        transLang = "English"
-    session['translation'] = api.getTranslation(word, session['language'], transLang)
+        trans_lang = "English"
+    session['translation'] = api.getTranslation(word, session['language'], trans_lang)
+
+    if not session['checked']:
+        return render_template("vocabulary.html", word=word, trans_lang=trans_lang)
+
+    session['test_data'].pop()
+    session['checked'] = False
+    
 
     trans_lang = ""
     if session['language'] == "English":
@@ -199,13 +210,20 @@ def audio():
     if session['test_data'] == []:
         return render_template("home.html")
 
-    phrase = session['test_data'].pop()
+    phrase = session['test_data'][len(session['test_data']) - 1]
+    session['current'] = phrase
 
     trans_lang = ""
     if session['language'] == "English":
         trans_lang = "German"
     else:
         trans_lang = "English"
+
+    if not session['checked']:
+        return render_template("audio.html", phrase=phrase, trans_lang=trans_lang) #TODO
+
+    session['checked'] = False
+    session['test_data'].pop()
         
     return render_template("audio.html", phrase=phrase, trans_lang=trans_lang) #TODO
 
@@ -214,21 +232,40 @@ def audio():
 ###########################################
 @main.route("/check", methods=['POST'])
 def check():
-    if not request.args.get('translation'):
+    if not request.get_data() or not request.get_json():
         flash("Sorry, something went wrong. Please try again.")
 
-    translation = request.args.get('translation')
+        if session['exercise'] == "vocabulary":
+                return redirect("/vocabulary")
+        else:
+            return redirect("/vocabulary") #TODO /audio
 
-    if not (translation.strip()).lower() == (translation.strip()).lower():
-        return jsonify(success=False)
+    translation = request.get_json()['translation']
 
-    return jsonify(success=True)
+    for item in session['translation']:
+        if not (translation.strip()).lower() == (item.strip()).lower():
+            flash("Wrong translation")
+            
+            print(item)
 
+            if session['exercise'] == "vocabulary":
+                return redirect("/vocabulary")
+            else:
+                return redirect("/vocabulary") #TODO /audio
+
+    if session['exercise'] == "vocabulary":
+        session['checked'] = True
+        return redirect("/vocabulary")
+    elif session['exercise'] == "audio":
+        session['checked'] = True
+        return redirect("/audio")
+    else:
+        return redirect("/")
 
 ###########################################
 #Sessions
 ###########################################
-#
+
 # 'exercise' string - name of the exercise vocabulary, phrase or audio
 # 'book' string - name of book(s) 
 # 'selection' string - unit or topic
@@ -238,3 +275,5 @@ def check():
 # 'started' boolean - only first time on vocabulary for api request
 # 'test_data' list of dict - list of data (vocabulary or audio), length equals selected amount 
 # 'translation' string - translation for the word in vocabulary
+# 'current' string - current word or phrase
+# 'checked' boolean - when translation is true
