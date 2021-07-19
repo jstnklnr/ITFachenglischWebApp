@@ -4,6 +4,8 @@ from flask import render_template
 from flask import session
 from flask import request
 from flask import redirect
+from flask import flash
+from flask import jsonify
 
 from api_interface import Api
 
@@ -95,14 +97,14 @@ def language():
     namelist = api.getLanguages()
     num = len(namelist)
     headline = "language"
-    href = ""
+    href = "amount"
 
     if session["exercise"] == "vocabulary":
         href = "vocabulary"
     else:
         href = "phrase"
 
-    return render_template("selection.html", num=num, namelist=namelist, headline=headline)
+    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href)
 
 
 @main.route('/amount')
@@ -110,17 +112,23 @@ def amount():
     if session["exercise"] != "vocabulary" and session["exercise"] != "phrase" and session["exercise"] != "audio":
         return render_template("home.html")
 
+    href = ""
     if session["exercise"] == "vocabulary":
 
         if not request.args.get('language'):
                 return "failed"
 
         session['language'] = request.args.get('language')
+        href = "vocabulary"
+    elif session["exercise"] == "audio":
+        href = "audio"
 
     session['ready'] = True
     session['started'] = True
         
-    return "amount"#render_template("amount.html")
+    return "amount"#render_template("amount.html", href=href)
+
+
 ############################################
 #Exercise
 ############################################
@@ -159,7 +167,7 @@ def vocabulary():
         transLang = "German"
     else:
         transLang = "English"
-    translation = api.getTranslation(word, session['language'], transLang)
+    session['translation'] = api.getTranslation(word, session['language'], transLang)
 
     trans_lang = ""
     if session['language'] == "English":
@@ -167,7 +175,7 @@ def vocabulary():
     else:
         trans_lang = "English"
 
-    return render_template("vocabulary.html", word=word, translation=translation, trans_lang=trans_lang)
+    return render_template("vocabulary.html", word=word, trans_lang=trans_lang)
 
 
 @main.route('/audio')
@@ -185,7 +193,7 @@ def audio():
 
         amount = request.args.get('amount')
 
-        data = api.getAudio(amount)
+        data = api.getAudio(session['language'], amount)
         session['test_data'] = data
 
     if session['test_data'] == []:
@@ -201,6 +209,21 @@ def audio():
         
     return render_template("audio.html", phrase=phrase, trans_lang=trans_lang) #TODO
 
+###########################################
+#Util Route
+###########################################
+@main.route("/check", methods=['POST'])
+def check():
+    if not request.args.get('translation'):
+        flash("Sorry, something went wrong. Please try again.")
+
+    translation = request.args.get('translation')
+
+    if not (translation.strip()).lower() == (translation.strip()).lower():
+        return jsonify(success=False)
+
+    return jsonify(success=True)
+
 
 ###########################################
 #Sessions
@@ -213,4 +236,5 @@ def audio():
 # 'topic' string list - names of topics
 # 'ready' boolean - everything is selected
 # 'started' boolean - only first time on vocabulary for api request
-# 'test_data' list of dict - list of data (vocabulary or audio), length equals selected amount
+# 'test_data' list of dict - list of data (vocabulary or audio), length equals selected amount 
+# 'translation' string - translation for the word in vocabulary
