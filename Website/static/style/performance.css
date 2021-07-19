@@ -118,7 +118,7 @@ h2{
      line-height: 1.2;
      cursor: text;
 }
- .input__field {
+ #input__field {
 	 box-sizing: border-box;
 	 display: block;
 	 width: 100%;
@@ -129,7 +129,7 @@ h2{
      border-radius: var(--size-radius);
 
 }
- .input__field:focus + .input__label, .input__field:not(:placeholder-shown) + .input__label {
+ #input__field:focus + .input__label, #input__field:not(:placeholder-shown) + .input__label {
 	 transform: translate(0.25rem, -95%) scale(0.8);
 	/* color: var(--color-accent);*/
 }

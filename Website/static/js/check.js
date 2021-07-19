@@ -1,9 +1,14 @@
-document.getElementById("check").onclick(() => {
+function check(){
     const xhttp = new XMLHttpRequest();
     fetch("/check", {
         method: "POST",
-        body: {"translation": document.getElementById("input_field").value}
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({"translation": document.getElementById("input__field").value})    
     }).then(res => {
-        console.log(res)
+        if(res.redirected){
+            document.getElementById("continue").addEventListener("click", ()=>{
+                window.location.replace(res.url);
+            })
+        }
       });
-})
+}

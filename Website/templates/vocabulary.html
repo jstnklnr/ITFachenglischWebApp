@@ -9,19 +9,24 @@
 </head>
 <body>
     <img src="{{ url_for('static', filename='img/lowpoly-grey-gradient-vector.png') }}" alt="background_vocabulary" class="background_image">
+
+        {% for message in get_flashed_messages() %}
+        <span>{{ message }}</span>
+        {% endfor %}
+
         <article class="l-design-widht">        
             <div class="card">
                 <h1>Vocabulary test</h1>  
               <div class="card card--accent">
               <h2> <img src="{{ url_for('static', filename='svg/12837215941548336240.svg') }}" alt="svg" class="icon">{{word}}</h2>
               <label class="input">
-                <input id="input_field" type="text" placeholder=" " />
+                <input id="input__field" type="text" placeholder=" " />
                 <span class="input__label">{{trans_lang}} word</span>
               </label>
-              
+
               <div class="button-group">
-                <button id="check">Check</button>
-                <button type="reset">Reset</button>
+                <button id="check" onclick="check()">Check</button>
+                <button id="continue" type="reset">Continue</button>
               </div>
             </div>
           </article>
