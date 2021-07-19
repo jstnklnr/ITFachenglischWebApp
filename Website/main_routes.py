@@ -5,7 +5,7 @@ from flask import session
 from flask import request
 from flask import redirect
 from flask import flash
-from flask import jsonify
+from flask import url_for
 
 from api_interface import Api
 
@@ -135,13 +135,12 @@ def amount():
 @main.route('/vocabulary')
 def vocabulary():
     if not session['ready'] or session['exercise'] != "vocabulary":
-        print(session['ready'])
-        print(session['exercise'])
         return render_template("home.html")
 
     if session['started']:
         session['test_data'] = []
         session['started'] = False
+        session['checked'] = False
 
         amount = 0
         if not request.args.get('amount'):
@@ -178,13 +177,6 @@ def vocabulary():
 
     session['test_data'].pop()
     session['checked'] = False
-    
-
-    trans_lang = ""
-    if session['language'] == "English":
-        trans_lang = "German"
-    else:
-        trans_lang = "English"
 
     return render_template("vocabulary.html", word=word, trans_lang=trans_lang)
 
@@ -232,13 +224,12 @@ def audio():
 ###########################################
 @main.route("/check", methods=['POST'])
 def check():
-    if not request.get_data() or not request.get_json():
+    if not request.get_json():
         flash("Sorry, something went wrong. Please try again.")
 
         if session['exercise'] == "vocabulary":
-                return redirect("/vocabulary")
-        else:
-            return redirect("/vocabulary") #TODO /audio
+                return redirect(url_for("main.vocabulary"))
+        return redirect(url_for("main.vocabulary")) #TODO /audio
 
     translation = request.get_json()['translation']
 
@@ -247,20 +238,18 @@ def check():
             flash("Wrong translation")
             
             print(item)
-
             if session['exercise'] == "vocabulary":
-                return redirect("/vocabulary")
-            else:
-                return redirect("/vocabulary") #TODO /audio
+                return redirect(url_for("main.vocabulary"))
+            return redirect(url_for("main.vocabulary")) #TODO /audio
 
     if session['exercise'] == "vocabulary":
+        print(3)
         session['checked'] = True
-        return redirect("/vocabulary")
+        return redirect("vocabulary")
     elif session['exercise'] == "audio":
         session['checked'] = True
         return redirect("/audio")
-    else:
-        return redirect("/")
+    return redirect("/")
 
 ###########################################
 #Sessions
