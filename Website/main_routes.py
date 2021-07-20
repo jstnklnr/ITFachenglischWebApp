@@ -227,7 +227,6 @@ def check():
         translation = translation[0: -2]
 
     item = translation.replace(" ", "")
-    print(translation);
 
     for item in session['translation']:
         item = item.strip().lower()
@@ -239,7 +238,6 @@ def check():
             item = item[0: -2]
 
         item = item.replace(" ", "")
-        print(item)
 
         if translation == item:
             found_translation = True
