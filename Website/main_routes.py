@@ -8,6 +8,8 @@ from flask import flash
 from flask import url_for
 
 from api_interface import Api
+from util import getWordAmount
+from util import addSpecificKeyValueToList
 
 main = Blueprint('main', __name__)
 api = Api("https://localhost:5000")
@@ -17,23 +19,23 @@ api = Api("https://localhost:5000")
 ############################################
 @main.route('/')
 def index():
-    return render_template("home.html")
+    return render_template("index.html")
 
 @main.route('/exercise-selection')
 def exercise_selection():
-    return render_template("exercise_selection.html")
+    return render_template("exercise.html")
 
 @main.route('/vocabulary-sel')
 def vocabel_sel():
     session["exercise"] = "vocabulary"
     return redirect('/book-selection') 
 
-@main.route('/audio-sel')
+@main.route('/audio-sel') #TODO
 def audio_sel():
     session["exercise"] = "audio"
     return redirect("/amount") 
 
-@main.route('/phrase-sel')
+@main.route('/phrase-sel')  #TODO
 def phrase_sel():
     session["exercise"] = "phrase"
     return redirect('/language')  
@@ -45,19 +47,18 @@ def phrase_sel():
 @main.route('/book-selection')
 def book_selection():
     if session["exercise"] != "vocabulary":
-        return render_template("home.html")
+        return render_template("index.html")
 
     namelist = api.getBooks()
-    num = len(namelist)
-    headline = "Book"
+    headline = "Select your book"
     href = "selection"
 
-    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href)
+    return render_template("selection.html", num=len(namelist), namelist=namelist, headline=headline, href=href, selection_type="book")
 
 @main.route('/selection')
 def selection():
     if session["exercise"] != "vocabulary":
-        return render_template("home.html")
+        return render_template("index.html")
 
     if not request.args.get("book"):
         return "failed"
@@ -69,34 +70,41 @@ def selection():
     headline = ""
     if "," in str(session['book']):
         session['selection'] = "topic"
-        namelist = api.getTopics()
+        namelist = addSpecificKeyValueToList(api.getTopics(), "topic")
+        session['unit_topic_list'] = namelist
+        session['amount_list'] = addSpecificKeyValueToList(api.getTopics(), "amount")
         num = len(namelist)
         headline = "Topic"
     else:
         session['selection'] = "unit"
-        namelist = api.getUnits(session["book"])
+        namelist = addSpecificKeyValueToList(api.getUnits(session["book"]), "unit")
+        session['unit_topic_list'] = namelist
+        session['amount_list'] = addSpecificKeyValueToList(api.getUnits(session["book"]), "amount")
         num = len(namelist)
         headline = "Unit"
-    href="language"
+    href="Select your language"
 
-    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href)
+    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href, selection_type="topic_unit")
 
 @main.route('/language')
 def language():
     if session["exercise"] != "vocabulary" and session["exercise"] != "phrase":
-       return render_template("home.html")
+       return render_template("index.html")
     
     if not request.args.get('topic') and not request.args.get('unit'):
-        return "failed"
+        return redirect("selection")
 
     if session['selection'] == "topic":
         session['topic'] = request.args.get('topic')
+        session['max_amount'] = getWordAmount(session['unit_topic_list'], session['amount_list'], session['topic'].split(","))
+
     else:
         session['unit'] = request.args.get('unit')
+        session['max_amount'] = getWordAmount(session['unit_topic_list'], session['amount_list'], session['unit'].split(","))
 
     namelist = api.getLanguages()
     num = len(namelist)
-    headline = "language"
+    headline = "Select your language"
     href = "amount"
 
     if session["exercise"] == "vocabulary":
@@ -104,20 +112,17 @@ def language():
     else:
         href = "phrase"
 
-    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href)
-
+    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href, selection_type="language")
 
 @main.route('/amount')
 def amount():
     if session["exercise"] != "vocabulary" and session["exercise"] != "phrase" and session["exercise"] != "audio":
-        return render_template("home.html")
+        return render_template("index.html")
 
     href = ""
     if session["exercise"] == "vocabulary":
-
         if not request.args.get('language'):
-                return "failed"
-
+                return redirect("language")
         session['language'] = request.args.get('language')
         href = "vocabulary"
     elif session["exercise"] == "audio":
@@ -125,9 +130,9 @@ def amount():
 
     session['ready'] = True
     session['started'] = True
+    headline = "Select your amount"
         
-    return "amount"#render_template("amount.html", href=href)
-
+    return render_template("selection.html", headline=headline, href=href, selection_type="amount", amount=session['max_amount'])
 
 ############################################
 #Exercise
@@ -135,16 +140,16 @@ def amount():
 @main.route('/vocabulary')
 def vocabulary():
     if not session['ready'] or session['exercise'] != "vocabulary":
-        return render_template("home.html")
+        return render_template("index.html")
 
     if session['started']:
+        session['count'] = 0
         session['test_data'] = []
         session['started'] = False
-        session['checked'] = False
 
         amount = 0
         if not request.args.get('amount'):
-            return "failed"
+            return redirect("amount")
 
         amount = request.args.get('amount')    
 
@@ -160,7 +165,7 @@ def vocabulary():
         session['test_data'] = data
 
     if session['test_data'] == []:
-        return render_template("home.html")
+        return render_template("index.html")
 
     word = session['test_data'][len(session['test_data']) - 1]
     session['current'] = word
@@ -170,21 +175,16 @@ def vocabulary():
         trans_lang = "German"
     else:
         trans_lang = "English"
+
     session['translation'] = api.getTranslation(word, session['language'], trans_lang)
-
-    if not session['checked']:
-        return render_template("vocabulary.html", word=word, trans_lang=trans_lang)
-
     session['test_data'].pop()
-    session['checked'] = False
 
-    return render_template("vocabulary.html", word=word, trans_lang=trans_lang)
-
+    return render_template("selection.html", word=word, selection_type="vocabulary", headline="", href="#")
 
 @main.route('/audio')
 def audio():
     if not session['ready'] or session['exercise'] != "audio":
-        return render_template("home.html")
+        return render_template("index.html")
 
     if session['started']:
         session['test_data'] = []
@@ -192,7 +192,7 @@ def audio():
 
         amount = 0
         if request.args.get('amount'):
-            return "failed"
+            return redirect("amount")
 
         amount = request.args.get('amount')
 
@@ -200,24 +200,12 @@ def audio():
         session['test_data'] = data
 
     if session['test_data'] == []:
-        return render_template("home.html")
+        return render_template("index.html")
 
-    phrase = session['test_data'][len(session['test_data']) - 1]
+    phrase = session['test_data'].pop()
     session['current'] = phrase
-
-    trans_lang = ""
-    if session['language'] == "English":
-        trans_lang = "German"
-    else:
-        trans_lang = "English"
-
-    if not session['checked']:
-        return render_template("audio.html", phrase=phrase, trans_lang=trans_lang) #TODO
-
-    session['checked'] = False
-    session['test_data'].pop()
         
-    return render_template("audio.html", phrase=phrase, trans_lang=trans_lang) #TODO
+    return render_template("selection.html", phrase=phrase, selection_type="audio", headline="", href="#")
 
 ###########################################
 #Util Route
@@ -225,36 +213,28 @@ def audio():
 @main.route("/check", methods=['POST'])
 def check():
     if not request.get_json():
-        flash("Sorry, something went wrong. Please try again.")
-
-        if session['exercise'] == "vocabulary":
-                return redirect(url_for("main.vocabulary"))
-        return redirect(url_for("main.vocabulary")) #TODO /audio
+        return 400
 
     translation = request.get_json()['translation']
+    found_translation = False
 
     for item in session['translation']:
-        if not (translation.strip()).lower() == (item.strip()).lower():
-            flash("Wrong translation")
-            
-            print(item)
-            if session['exercise'] == "vocabulary":
-                return redirect(url_for("main.vocabulary"))
-            return redirect(url_for("main.vocabulary")) #TODO /audio
+        if translation.strip().lower() == item.strip().lower():
+            found_translation = True
 
-    if session['exercise'] == "vocabulary":
-        print(3)
-        session['checked'] = True
-        return redirect("vocabulary")
-    elif session['exercise'] == "audio":
-        session['checked'] = True
-        return redirect("/audio")
-    return redirect("/")
+    session['checked'] = True
+
+    if not found_translation:
+        return {"Success": False, "Translations": session["translation"]}, 200
+
+    session['count'] += 1
+
+    return {"Success": True }, 200
 
 ###########################################
 #Sessions
 ###########################################
-
+#
 # 'exercise' string - name of the exercise vocabulary, phrase or audio
 # 'book' string - name of book(s) 
 # 'selection' string - unit or topic
@@ -265,4 +245,7 @@ def check():
 # 'test_data' list of dict - list of data (vocabulary or audio), length equals selected amount 
 # 'translation' string - translation for the word in vocabulary
 # 'current' string - current word or phrase
-# 'checked' boolean - when translation is true
+# 'count' int - number of right answers
+# 'max_amount' int - get the max amount of exercises
+# 'amount_list' list - temporary cache to get the max amount for the exercise
+# 'unit_topic_list' list - temporary cache to get the max amount for the exercise

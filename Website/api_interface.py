@@ -10,7 +10,7 @@ class Api():
 
         unitList = []
         for item in json.loads(res.text):
-            unitList.append(item['unit'])
+            unitList.append(item)
 
         return unitList
     
@@ -19,7 +19,7 @@ class Api():
 
         topicList = []
         for item in json.loads(res.text):
-            topicList.append(item['topic'])
+            topicList.append(item)
 
         return topicList
 

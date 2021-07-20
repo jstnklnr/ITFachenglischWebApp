@@ -69,6 +69,7 @@ class Vocabulary(Resource):
                                     JOIN books ON books.id = vocabulary.book
                                     JOIN topics ON topics.id = vocabulary.topic
                                     WHERE ({book_str}) AND ({topic_str}) AND ({langs_str})
+                                    GROUP BY vocabulary.translation 
                                     ORDER BY random() {limit_string}
                                     """, tuple(books + topics + langs + ([args['amount']] if args["amount"] else [])))
         else:
@@ -81,7 +82,8 @@ class Vocabulary(Resource):
                                     JOIN languages ON languages.id = vocabulary.language
                                     JOIN books ON books.id = vocabulary.book
                                     JOIN units ON units.id = vocabulary.unit
-                                    WHERE ({book_str}) AND ({unit_str}) AND ({langs_str}) 
+                                    WHERE ({book_str}) AND ({unit_str}) AND ({langs_str})
+                                    GROUP BY vocabulary.translation 
                                     ORDER BY random() {limit_string}
                                     """, tuple(books + units + langs + ([args['amount']] if args["amount"] else [])))
         return result_list, 200

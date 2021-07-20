@@ -16,4 +16,4 @@ def create_app():
     return app
 
 app = create_app()
-app.run(port=8080, ssl_context='adhoc')
+app.run('0.0.0.0', port=8080, ssl_context='adhoc', debug=True)
