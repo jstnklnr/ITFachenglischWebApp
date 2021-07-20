@@ -7,8 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="{{ url_for('static', filename='style/selection.css') }}" rel="stylesheet">
 
-        <!-- Bootstrap CSS -->
-        <link href="{{ url_for('static', filename='style/bootstrap.min.css') }}" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+        <!-- Bootstrap CSS  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"-->
+        <link href="{{ url_for('static', filename='style/bootstrap.min.css') }}" rel="stylesheet">
         
         <!-- Scripts -->
         <script src="{{ url_for('static', filename='js/selection.js') }}"></script>
@@ -38,7 +39,7 @@
                 {% endif %}
 
 
-                {% if selection_type == "topic_unit" %}
+                {% if selection_type == "topic" or selection_type == "unit" %}
                 {% for i in range(num) %}
                 <div class="col-xl-2 col-md-4 col-sm-6 col-xs-12 mt-3">
                     <a href="#">
@@ -69,7 +70,7 @@
                 {% if selection_type == "amount" %}
                 <div class="col-md-6 col-sm-12 border border-2 border-secondary range-selection">
                     <label for="customRange1" class="form-label display-6" data-text="Dein Text"></label>
-                    <input type="range" class="form-range" min="1" max="{{amount}}" step="1" value="10" id="customRange1">
+                    <input type="range" class="form-range" min="1" max="{{amount}}" step="1" value="{{10 if amount >= 10 else amount}}" id="customRange1">
                 </div>
                 {% endif %}
 
@@ -140,7 +141,7 @@
                     </a>
                 </div>
                 <div class="position-relative col-sm-6 col-xs-12">
-                    <a class="position-absolute w-25 text-center start-50 translate-middle-x" id="checkButton" href='{{href}}'>
+                    <a class="position-absolute w-25 text-center start-50 translate-middle-x" id="checkButton" href='#'>
                         <div class="position-relative border border-2 border-success shadow-lg function-button">
                             <h4 class="text-dark">{% if selection_type == "vocabulary" %} Check {% else %} Continue {% endif %}</h4>
                         </div>
@@ -150,6 +151,41 @@
         </footer>
 
         <!-- Option 1: Bootstrap Bundle with Popper -->
-        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+        <script>
+            let checkButtonClick = () => {};
+        </script>
+
+
+        {% if selection_type == "book" or selection_type == "topic" or selection_type == "unit" or selection_type == "language" %}
+            <script>
+                checkButtonClick = () => {
+                    let switches = document.getElementsByClassName("selection-switch");
+                    let items = [];
+
+                    for(let i = 0; i < switches.length; i++)
+                        if(switches[i].getElementsByTagName("input")[0].checked)
+                            items.push(switches[i].getElementsByTagName("h3")[0].innerText);
+
+                    let url = "{{href}}?{{selection_type}}=" + encodeURIComponent(items.join(","));
+
+                    if(items.length > 0)
+                        window.location.href = url;
+                };
+            </script>
+        {% endif %}
+
+        {% if selection_type == "amount" %}
+            <script>
+                checkButtonClick = () => {
+                    window.location.href = `{{href}}?amount=${document.getElementById("customRange1").value}`;
+                };
+            </script>
+        {% endif %}
+
+        <script>
+            document.getElementById("checkButton").addEventListener("click", checkButtonClick);
+        </script>
     </body>
 </html>

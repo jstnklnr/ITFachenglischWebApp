@@ -82,9 +82,9 @@ def selection():
         session['amount_list'] = addSpecificKeyValueToList(api.getUnits(session["book"]), "amount")
         num = len(namelist)
         headline = "Unit"
-    href="Select your language"
+    href="language"
 
-    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href, selection_type="topic_unit")
+    return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href, selection_type=session["selection"])
 
 @main.route('/language')
 def language():
@@ -107,10 +107,12 @@ def language():
     headline = "Select your language"
     href = "amount"
 
+    """
     if session["exercise"] == "vocabulary":
         href = "vocabulary"
     else:
         href = "phrase"
+        """
 
     return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href, selection_type="language")
 
@@ -215,11 +217,31 @@ def check():
     if not request.get_json():
         return 400
 
-    translation = request.get_json()['translation']
+    translation = request.get_json()['translation'].replace("-", " ").strip().lower()
     found_translation = False
 
+    if translation.startswith("to "):
+        translation = translation[2:]
+
+    if translation.endswith(" to"):
+        translation = translation[0: -2]
+
+    item = translation.replace(" ", "")
+    print(translation);
+
     for item in session['translation']:
-        if translation.strip().lower() == item.strip().lower():
+        item = item.strip().lower()
+
+        if item.startswith("to "):
+            item = item[2:]
+
+        if item.endswith(" to"):
+            item = item[0: -2]
+
+        item = item.replace(" ", "")
+        print(item)
+
+        if translation == item:
             found_translation = True
 
     session['checked'] = True
@@ -229,7 +251,7 @@ def check():
 
     session['count'] += 1
 
-    return {"Success": True }, 200
+    return {"Success": True, "Translations": session["translation"] }, 200
 
 ###########################################
 #Sessions

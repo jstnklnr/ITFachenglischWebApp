@@ -18,7 +18,7 @@ function check() {
                 else if(data.Success){
                     checkMessage = `<div id="alert" class="alert alert-success" role="alert"></div>`
                     document.getElementById("headline").innerHTML = checkMessage;
-                    document.getElementById("alert").innerHTML = "Right.";
+                    document.getElementById("alert").innerHTML = "Correct. Possible translations: " + data.Translations.join(', ');
                 }
 
                 let checkButton = document.getElementById("checkButton");
