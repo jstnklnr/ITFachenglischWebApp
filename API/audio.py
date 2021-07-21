@@ -28,7 +28,7 @@ class Audio(Resource):
             limit_str = "LIMIT ?"
 
         result_list = db.query_dict(f"""
-                                SELECT phrases.phrase
+                                SELECT phrases.phrase, phrases.audio
                                 FROM phrases 
                                 JOIN languages 
                                 ON languages.id = phrases.language 

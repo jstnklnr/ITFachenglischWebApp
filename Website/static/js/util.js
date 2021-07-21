@@ -9,22 +9,21 @@ function check() {
         body: JSON.stringify({"translation": document.getElementById("controlTextarea1").value})
     }).then(res => {
             res.json().then(data => {
-                console.log(data.Success)
-                if(!data.Success){
-                    checkMessage =  `<div id="alert" class="alert alert-danger" role="alert"></div>`
-                    document.getElementById("headline").innerHTML = checkMessage
-                    document.getElementById("alert").innerHTML = "Wrong translation. Possible translation: " + data.Translations.join(', ');
-                }
-                else if(data.Success){
-                    checkMessage = `<div id="alert" class="alert alert-success" role="alert"></div>`
-                    document.getElementById("headline").innerHTML = checkMessage;
-                    document.getElementById("alert").innerHTML = "Correct. Possible translations: " + data.Translations.join(', ');
-                }
+                checkMessage = data.Success ? `<div id="alert" class="alert alert-success" role="alert"></div>` : `<div id="alert" class="alert alert-danger" role="alert"></div>`;
+                document.getElementById("headline").innerHTML = checkMessage
+                message = "";
+
+                if(data.Translations)
+                    message = (data.Success ? "Correct." : "Wrong.") + " Possible translation: " + data.Translations.join(", ");
+                else if(data.Phrase)
+                    message = (data.Success ? "Correct." : "Wrong.") + " Answer: " + data.Phrase;
+
+                document.getElementById("alert").innerHTML = message;
 
                 let checkButton = document.getElementById("checkButton");
-                checkButton.setAttribute("href", "vocabulary");
+                checkButton.setAttribute("href", checkHref);
                 checkButton.removeEventListener("click", check);
-                checkButton.getElementsByTagName("h4")[0].innerText = "Continue";
+                checkButton.getElementsByClassName("btn")[0].innerText = "Continue";
             });
         });
         

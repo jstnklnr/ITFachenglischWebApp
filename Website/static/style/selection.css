@@ -21,8 +21,11 @@ body {
 }
 
 .selection-button:hover, .selection-switch:hover {
-    background-color: #ededed;
+    background-color: #72b462;
     transition: 0.2s;
+    -webkit-box-shadow: 15px 17px 43px 11px rgba(0,0,0,0.5);
+    -moz-box-shadow: 15px 17px 43px 11px rgba(0,0,0,0.5);
+    box-shadow: 15px 17px 43px 11px rgba(0,0,0,0.5);
 }
 
 .selection-switch .form-check-input {
@@ -61,4 +64,25 @@ a, a:link, a:visited, a:hover, a:active {
 
 .top-75 {
     top: 75%;
+}
+
+.border {
+    -webkit-box-shadow: 10px 14px 43px 11px rgba(0,0,0,0.38);
+    -moz-box-shadow: 10px 14px 43px 11px rgba(0,0,0,0.38);
+    box-shadow: 10px 14px 43px 11px rgba(0,0,0,0.38);
+}
+
+h1 {
+    color: #000000;
+    letter-spacing: .1em;
+
+    text-shadow: 
+      0 -1px 0 #2c2c2c, 
+      0 1px 0 #2e2e2e, 
+      0 2px 0 #2c2c2c, 
+      0 22px 30px rgba(0, 0, 0, 0.6);
+}
+
+.icon-style {
+    width: 80px;
 }

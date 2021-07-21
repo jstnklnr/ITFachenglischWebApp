@@ -73,8 +73,6 @@ class Api():
 
             request_string = self.url + "/vocabulary?book=" + bookStr + "&lang=" + lang + "&unit=" + unitStr 
 
-        print(amount)
-
         if amount != 0:
             request_string += "&amount=" + amount
 
@@ -82,7 +80,7 @@ class Api():
 
         vocabularyList = []
         for item in json.loads(res.text):
-            vocabularyList.append(item['word'])
+            vocabularyList.append({"word": item['word'], "language": item['language']})
 
         return vocabularyList
 
@@ -96,12 +94,18 @@ class Api():
         return transList
 
     def getAudio(self, lang:str, amount:int):
-        res = repr.get(self.url + "audio?lang=" + lang + "&amount=" + amount)
+        res = requests.get(self.url + "/audio?lang=" + lang + "&amount=" + amount, verify=False)
 
         audioList = []
         for item in json.loads(res.text):
-            audioList.append(item['phrase'])
+            audioList.append({"phrase": item['phrase'], "audio": item['audio']})
 
         return audioList
+
+    def get_phrases_amount(self):
+        res = requests.get(self.url + "/phrases?get-amount=true", verify=False)
+        amount = json.loads(res.text)['amount']
+
+        return amount 
 
 #print(Api("https://localhost:5000").getTranslation("für etwas Werbung machen", "German", "English"))

@@ -63,13 +63,13 @@ class Vocabulary(Resource):
             topic_str = " OR ".join(["topics.topic = ?"] * len(topics))
 
             result_list = db.query_dict(f"""
-                                    SELECT vocabulary.word 
+                                    SELECT vocabulary.word, languages.language
                                     FROM vocabulary
                                     JOIN languages ON languages.id = vocabulary.language
                                     JOIN books ON books.id = vocabulary.book
                                     JOIN topics ON topics.id = vocabulary.topic
                                     WHERE ({book_str}) AND ({topic_str}) AND ({langs_str})
-                                    GROUP BY vocabulary.translation 
+                                    {'GROUP BY vocabulary.translation' if len(langs) == 1 else ''} 
                                     ORDER BY random() {limit_string}
                                     """, tuple(books + topics + langs + ([args['amount']] if args["amount"] else [])))
         else:
@@ -77,13 +77,13 @@ class Vocabulary(Resource):
             unit_str = " OR ".join(["units.unit = ?"] * len(units))
 
             result_list = db.query_dict(f"""
-                                    SELECT vocabulary.word 
+                                    SELECT vocabulary.word, languages.language 
                                     FROM vocabulary
                                     JOIN languages ON languages.id = vocabulary.language
                                     JOIN books ON books.id = vocabulary.book
                                     JOIN units ON units.id = vocabulary.unit
                                     WHERE ({book_str}) AND ({unit_str}) AND ({langs_str})
-                                    GROUP BY vocabulary.translation 
+                                    {'GROUP BY vocabulary.translation' if len(langs) == 1 else ''} 
                                     ORDER BY random() {limit_string}
                                     """, tuple(books + units + langs + ([args['amount']] if args["amount"] else [])))
         return result_list, 200

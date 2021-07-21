@@ -107,13 +107,6 @@ def language():
     headline = "Select your language"
     href = "amount"
 
-    """
-    if session["exercise"] == "vocabulary":
-        href = "vocabulary"
-    else:
-        href = "phrase"
-        """
-
     return render_template("selection.html", num=num, namelist=namelist, headline=headline, href=href, selection_type="language")
 
 @main.route('/amount')
@@ -129,6 +122,7 @@ def amount():
         href = "vocabulary"
     elif session["exercise"] == "audio":
         href = "audio"
+        session["max_amount"] = api.get_phrases_amount()
 
     session['ready'] = True
     session['started'] = True
@@ -170,18 +164,18 @@ def vocabulary():
         return render_template("index.html")
 
     word = session['test_data'][len(session['test_data']) - 1]
-    session['current'] = word
+    session['current'] = word['word']
 
     trans_lang = ""
-    if session['language'] == "English":
+    if word['language'] == "English":
         trans_lang = "German"
     else:
         trans_lang = "English"
 
-    session['translation'] = api.getTranslation(word, session['language'], trans_lang)
+    session['translation'] = api.getTranslation(word['word'], word['language'], trans_lang)
     session['test_data'].pop()
 
-    return render_template("selection.html", word=word, selection_type="vocabulary", headline="", href="#")
+    return render_template("selection.html", word=word['word'], selection_type="vocabulary", headline="", href="vocabulary")
 
 @main.route('/audio')
 def audio():
@@ -189,25 +183,26 @@ def audio():
         return render_template("index.html")
 
     if session['started']:
+        session['count'] = 0
         session['test_data'] = []
         session['started'] = False
 
         amount = 0
-        if request.args.get('amount'):
+        if not request.args.get('amount'):
             return redirect("amount")
 
         amount = request.args.get('amount')
 
-        data = api.getAudio(session['language'], amount)
+        data = api.getAudio("English", amount) #TODO allow other languages
         session['test_data'] = data
 
     if session['test_data'] == []:
         return render_template("index.html")
 
     phrase = session['test_data'].pop()
-    session['current'] = phrase
+    session['current'] = phrase['phrase']
         
-    return render_template("selection.html", phrase=phrase, selection_type="audio", headline="", href="#")
+    return render_template("selection.html", phrase=phrase['audio'], selection_type="audio", headline="Type the spoken text", href="audio")
 
 ###########################################
 #Util Route
@@ -217,39 +212,46 @@ def check():
     if not request.get_json():
         return 400
 
-    translation = request.get_json()['translation'].replace("-", " ").strip().lower()
-    found_translation = False
+    if session['exercise'] == "vocabulary":
+        translation = request.get_json()['translation'].replace("\n", "").replace("\'", "").replace("-", " ").replace(".", "").replace(",", "").replace("?", "").replace("!", "").strip().lower()
+        found_translation = False
 
-    if translation.startswith("to "):
-        translation = translation[2:]
+        if translation.startswith("to "):
+            translation = translation[2:]
 
-    if translation.endswith(" to"):
-        translation = translation[0: -2]
+        if translation.endswith(" to"):
+            translation = translation[0: -2]
 
-    item = translation.replace(" ", "")
+        translation = translation.replace(" ", "")
 
-    for item in session['translation']:
-        item = item.strip().lower()
+        for item in session['translation']:
+            item = item.replace("\n", "").replace("\'", "").replace("-", " ").replace(".", "").replace(",", "").replace("?", "").replace("!", "").strip().lower()
 
-        if item.startswith("to "):
-            item = item[2:]
+            if item.startswith("to "):
+                item = item[2:]
 
-        if item.endswith(" to"):
-            item = item[0: -2]
+            if item.endswith(" to"):
+                item = item[0: -2]
 
-        item = item.replace(" ", "")
+            item = item.replace(" ", "")
 
-        if translation == item:
-            found_translation = True
+            if translation == item:
+                found_translation = True
 
-    session['checked'] = True
+        session['checked'] = True
 
-    if not found_translation:
-        return {"Success": False, "Translations": session["translation"]}, 200
+        if not found_translation:
+            return {"Success": False, "Translations": session["translation"]}, 200
 
-    session['count'] += 1
+        session['count'] += 1
 
-    return {"Success": True, "Translations": session["translation"] }, 200
+        return {"Success": True, "Translations": session["translation"] }, 200
+    elif session['exercise'] == "audio":
+        phrase = request.get_json()['translation'].lower().replace("\n", "").replace("\'", "").replace("-", " ").replace(".", "").replace(",", "").replace("?", "").replace("!", "").replace(" ", "")
+        current = session['current'].lower().replace("\n", "").replace("\'", "").replace("-", " ").replace(".", "").replace(",", "").replace("?", "").replace("!", "").replace(" ", "")
+        session['count'] += 1
+
+        return {"Success": phrase == current, "Phrase": session['current']}
 
 ###########################################
 #Sessions

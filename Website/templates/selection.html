@@ -78,15 +78,22 @@
                 {% if selection_type == "vocabulary" %}
                 <div class="col-md-6 col-sm-12 border border-2 border-secondary text-selection">
                     <label for="controlTextarea1" class="form-label display-6 pb-3">{{word}}</label>
-                    <textarea class="form-control mb-3 border-secondary" id="controlTextarea1" rows="3" style="resize: none;"></textarea>
+                    <textarea class="form-control mb-3 border-secondary" id="controlTextarea1" rows="3" style="resize: none;" spellcheck="false"></textarea>
                 </div>
                 {% endif %}
 
 
                 {% if selection_type == "audio" %}
                 <div class="col-md-6 col-sm-12 border border-2 border-secondary text-selection">
-                    <label for="controlTextarea1" class="form-label display-6 pb-3">{{word}}</label>
-                    <textarea class="form-control mb-3 border-secondary" id="controlTextarea1" rows="3" style="resize: none;"></textarea>
+                    <button class="btn" data-audio="{{phrase}}">
+                        <img src="{{ url_for('static', filename='media/volume-up-solid.svg') }}" class="icon-style" alt="volume up">
+                    </button>
+                    
+                    <button class="btn">
+                        <img src="{{ url_for('static', filename='media/turtle.svg') }}" class="icon-style" alt="turtle">
+                    </button>
+
+                    <textarea class="form-control mb-3 border-secondary" id="controlTextarea1" rows="3" style="resize: none;" spellcheck="false"></textarea>
                 </div>
                 {% endif %}
 
@@ -135,15 +142,15 @@
             <div class="row justify-content-center">
                 <div class="position-relative col-sm-6 col-xs-12">
                     <a class="position-absolute w-25 text-center start-50 translate-middle-x" href='home'>
-                        <div class="position-relative border border-2 border-success shadow-lg function-button">
-                            <h4 class="text-dark">Home</h4>
+                        <div class="btn position-relative btn-outline-success border border-success shadow-lg btn-lg">
+                            Home
                         </div>
                     </a>
                 </div>
                 <div class="position-relative col-sm-6 col-xs-12">
                     <a class="position-absolute w-25 text-center start-50 translate-middle-x" id="checkButton" href='#'>
-                        <div class="position-relative border border-2 border-success shadow-lg function-button">
-                            <h4 class="text-dark">{% if selection_type == "vocabulary" %} Check {% else %} Continue {% endif %}</h4>
+                        <div class="btn btn-outline-success position-relative border border-20 border-success shadow-lg btn-lg">
+                            {% if selection_type == "vocabulary" or selection_type == "audio" %} Check {% else %} Continue {% endif %}
                         </div>
                     </a>
                 </div>
@@ -155,6 +162,7 @@
 
         <script>
             let checkButtonClick = () => {};
+            let speechButton = () => {};
         </script>
 
 
@@ -184,7 +192,32 @@
             </script>
         {% endif %}
 
+        {% if selection_type == "audio" %}
+            <script>
+                let textSelection = document.getElementsByClassName("text-selection")[0];
+                let buttons = textSelection.getElementsByClassName("btn");
+
+                speechButton = (speed) => {
+                    let audioText = buttons[0].dataset.audio;
+
+                    var msg = new SpeechSynthesisUtterance();
+                    var voices = window.speechSynthesis.getVoices();
+                    msg.voice = voices[2]; // Note: some voices don't support altering params
+                    msg.volume = 1; // 0 to 1
+                    msg.rate = speed; // 0.1 to 10
+                    msg.pitch = 1; //0 to 2
+                    msg.text = audioText;
+                    msg.lang = 'en-US';
+                    speechSynthesis.speak(msg);
+                };
+
+                buttons[0].addEventListener("click", () => { speechButton(1.0) });
+                buttons[1].addEventListener("click", () => { speechButton(0.7) });
+            </script>
+        {% endif %}
+
         <script>
+            checkHref = "{{href}}"
             document.getElementById("checkButton").addEventListener("click", checkButtonClick);
         </script>
     </body>

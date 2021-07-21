@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import reqparse
 from flask_restful import Resource
+from flask_restful import inputs
 import static
 
 class Phrases(Resource):
@@ -9,10 +10,14 @@ class Phrases(Resource):
         self.reqparse.add_argument("lang", type = str)
         self.reqparse.add_argument("trans-lang", type = str)
         self.reqparse.add_argument("amount", type = int)
+        self.reqparse.add_argument("get-amount", type = inputs.boolean, default = False)
 
     def get(self):
         db = static.database
         args = self.reqparse.parse_args()
+
+        if args["get-amount"]:
+            return db.query_dict("SELECT COUNT(*) as amount FROM (SELECT * FROM phrases GROUP BY translation)")[0]
 
         #parameter missing
         if not args['lang']:
