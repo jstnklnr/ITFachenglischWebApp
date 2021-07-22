@@ -196,13 +196,17 @@
             <script>
                 let textSelection = document.getElementsByClassName("text-selection")[0];
                 let buttons = textSelection.getElementsByClassName("btn");
+                var voices = window.speechSynthesis.getVoices();
+
+                window.speechSynthesis.onvoiceschanged = function() {
+                    voices = window.speechSynthesis.getVoices();
+                };
 
                 speechButton = (speed) => {
                     let audioText = buttons[0].dataset.audio;
 
                     var msg = new SpeechSynthesisUtterance();
-                    var voices = window.speechSynthesis.getVoices();
-                    msg.voice = voices[2]; // Note: some voices don't support altering params
+                    msg.voice = voices[5]; // Note: some voices don't support altering params
                     msg.volume = 1; // 0 to 1
                     msg.rate = speed; // 0.1 to 10
                     msg.pitch = 1; //0 to 2
@@ -211,8 +215,8 @@
                     speechSynthesis.speak(msg);
                 };
 
-                buttons[0].addEventListener("click", () => { speechButton(1.0) });
-                buttons[1].addEventListener("click", () => { speechButton(0.7) });
+                buttons[0].addEventListener("click", () => { speechButton(1.2) });
+                buttons[1].addEventListener("click", () => { speechButton(0.6) });
             </script>
         {% endif %}
 
