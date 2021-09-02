@@ -601,6 +601,7 @@ ihre Übersetzung dieselbe translation-ID haben. (Quelle: Autor)
 &nbsp;
 
 ![view image](https://github.com/jstnklnr/ITFachenglischWebApp/blob/main/Images/view.png?raw=true)
+
 Abbildung A 5 - Grafik welche das Zusammenspiel der Komponenten darstellt.
 
 &nbsp;
